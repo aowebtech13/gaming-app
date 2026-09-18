@@ -1,0 +1,63 @@
+<%
+// Direct Ad Container Component (Server-Side Rendering)
+// Usage: include('modules/ad_direct.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: 'my-4' })
+// 
+// This template renders ads directly on the server for AdSense compatibility when PJAX is disabled.
+// Unlike ad_container.block.ejs which uses AJAX loading, this template fetches and renders ads 
+// during the initial page load, ensuring ad scripts are present when the page first loads.
+
+const placementSlug = locals.placement || 'default';
+const adWidth = locals.width || 300;
+const adHeight = locals.height || 250;
+const containerClasses = locals.classes || '';
+const autoSize = locals.autoSize || false;
+
+// Server-side ad fetching using pre-loaded ad data
+// The ad data should be pre-loaded by the controller and passed to the template
+let adData = null;
+let hasAd = false;
+
+// Check if ad data was pre-loaded for this placement
+if (typeof adsByPlacement !== 'undefined' && adsByPlacement[placementSlug]) {
+    adData = adsByPlacement[placementSlug];
+    hasAd = adData && adData.ad_code;
+}
+%>
+
+<div class="ad-container ad-direct <%= containerClasses %>" data-placement="<%= placementSlug %>" data-width="<%= adWidth %>" data-height="<%= adHeight %>">
+    <% if (hasAd) { %>
+        <% if (!autoSize) { %>
+        <div class="ad-wrapper relative overflow-hidden rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm" style="width: <%= adWidth %>px; height: <%= adHeight %>px;">
+        <% } else { %>
+        <div class="ad-wrapper relative overflow-hidden rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm">
+        <% } %>
+            <!-- Direct ad content (server-rendered) -->
+            <div class="ad-content">
+                <%- adData.ad_code %>
+            </div>
+            
+            <!-- Fallback for ad blockers or script failures -->
+            <div class="ad-fallback hidden p-4 text-center text-gray-500 dark:text-gray-400 text-xs">
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-4">
+                    <div class="text-gray-400 dark:text-gray-500 mb-1"><%= __('ads.advertisement') %></div>
+                    <div class="text-gray-300 dark:text-gray-600 text-xs"><%= __('ads.support_message') %></div>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- No ad available - show placeholder -->
+        <% if (!autoSize) { %>
+        <div class="ad-wrapper relative overflow-hidden rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm" style="width: <%= adWidth %>px; height: <%= adHeight %>px;">
+        <% } else { %>
+        <div class="ad-wrapper relative overflow-hidden rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm min-h-[100px]">
+        <% } %>
+            <!-- No ad placeholder -->
+            <div class="ad-fallback p-4 text-center text-gray-500 dark:text-gray-400 text-xs flex items-center justify-center h-full">
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-4">
+                    <div class="text-gray-400 dark:text-gray-500 mb-1"><%= __('ads.advertisement') %></div>
+                    <div class="text-gray-300 dark:text-gray-600 text-xs"><%= __('ads.support_message') %></div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>

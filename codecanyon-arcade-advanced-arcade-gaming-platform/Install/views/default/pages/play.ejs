@@ -1,0 +1,342 @@
+<%- include('../header.ejs', { page }) %>
+
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <%- include('../modules/header.block.ejs', { page }) %>
+
+    <div system-wrapper>
+        <!-- main content -->
+        <main class="container mx-auto px-4 sm:px-6 py-4 lg:py-6 space-y-6 lg:space-y-8">
+            <section class="flex flex-col lg:flex-row gap-8">
+                <!-- Game Frame -->
+                <div class="flex-1 flex flex-col items-center">
+                    <div id="game-container" data-game-id="<%= game.id %>" class="w-full bg-gray-200 dark:bg-gray-700 rounded-2xl shadow-lg flex items-center justify-center overflow-hidden" 
+                         style="width: <%= game.width || 800 %>px; height: <%= game.height || 600 %>px; max-width: 100%; aspect-ratio: <%= game.width || 800 %>/<%= game.height || 600 %>;">
+                        <% if (game.game_type === 'html' && game.game_file) { %>
+                            <!-- HTML5 Game -->
+                            <iframe id="game-frame" src="/<%= game.game_file %>?ctl-arcade=true" class="w-full h-full rounded-2xl" allowfullscreen></iframe>
+                        <% } else if (game.game_type === 'flash' && game.game_file) { %>
+                            <!-- Flash Game with Ruffle -->
+                            <div id="ruffle-container" class="w-full h-full rounded-2xl flex items-center justify-center">
+                                <div id="ruffle-player" class="w-full h-full" data-game-src="/<%= game.game_file %>"></div>
+                            </div>
+                        <% } else if (game.game_type === 'embed' && game.embed_url) { %>
+                            <!-- Embed URL -->
+                            <iframe id="game-frame" src="<%= game.embed_url %>" class="w-full h-full rounded-2xl" allowfullscreen></iframe>
+                        <% } else if (game.game_type === 'rom' && game.game_file && game.rom_system) { %>
+                            <!-- ROM Game with EmulatorJS (Iframe Isolated) -->
+                            <iframe id="emulator-iframe" 
+                                    src="/emulator/<%= game.id %>" 
+                                    class="w-full h-full rounded-2xl border-0" 
+                                    allowfullscreen>
+                            </iframe>
+                        <% } else { %>
+                            <!-- Fallback -->
+                            <div class="text-center text-gray-500 dark:text-gray-400">
+                                <svg class="w-16 h-16 text-4xl mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                                </svg>
+                                <p><%= __('games.not_available') %></p>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="flex flex-wrap gap-3 mt-4">
+                        <!-- View Mode Buttons -->
+                        <div class="flex bg-gray-100 dark:bg-gray-700 rounded-full p-1">
+                            <button id="mode-default" class="px-4 py-2 rounded-full text-sm font-medium transition bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm"><%= __('games.view_mode') %></button>
+                            <button id="mode-cinematic" class="px-4 py-2 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:bg-white dark:hover:bg-gray-600"><%= __('games.compact_view') %></button>
+                            <button id="mode-fullscreen" class="px-4 py-2 rounded-full text-sm font-medium text-gray-700 dark:text-gray-300 transition hover:bg-white dark:hover:bg-gray-600"><%= __('games.fullscreen') %></button>
+                        </div>
+                        <!-- Action Buttons -->
+                        <button id="share-btn" class="inline-flex items-center bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                            </svg><%= __('games.share_game') %>
+                        </button>
+                        <% if (user) { %>
+                        <button id="favorite-btn" class="inline-flex items-center <%= isFavorited ? 'bg-red-500 hover:bg-red-600' : 'bg-pink-500 hover:bg-pink-600' %> text-white px-6 py-2 rounded-full font-medium transition">
+                            <% if (isFavorited) { %>
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg><%= __('games.unfavorite') %>
+                            <% } else { %>
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg><%= __('games.favorite') %>
+                            <% } %>
+                        </button>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Below Game Banner Ad -->
+                    <div class="mt-6 flex justify-center">
+                        <% if (enable_frontend_pjax === '0') { %>
+                            <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                            <%- include('../modules/ad_direct.block.ejs', { placement: 'below-game-banner', width: 728, height: 90, classes: '!hidden lg:!block mx-auto' }) %>
+                            <!-- Mobile below-game ad (sidebar rectangle) -->
+                            <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden mx-auto' }) %>
+                        <% } else { %>
+                            <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                            <%- include('../modules/ad_container.block.ejs', { placement: 'below-game-banner', width: 728, height: 90, classes: '!hidden lg:!block mx-auto' }) %>
+                            <!-- Mobile below-game ad (sidebar rectangle) -->
+                            <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden mx-auto' }) %>
+                        <% } %>
+                    </div>
+                </div>
+                <!-- Game Info -->
+                <aside class="w-full lg:w-80 flex-shrink-0 space-y-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"><%= game.title %></h1>
+                        <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <span><%= game.category_name || 'Game' %></span>
+                            <% if (enable_ratings === '1') { %>
+                                <span>•</span>
+                                <span><%= parseFloat(gameRating).toFixed(1) %> ★</span>
+                                <span>•</span>
+                                <span><%= __('games.total_ratings') %>: <%= totalRatings %></span>
+                            <% } %>
+                        </div>
+                        
+                        <!-- Rating System -->
+                        <% if (enable_ratings === '1' && (user || allowGuestRating)) { %>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"><%= __('games.rate_game') %></p>
+                            <div class="flex gap-1" id="rating-stars">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                <button class="star-btn text-2xl transition-colors duration-200 <%= (userRating && userRating >= i) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600 hover:text-yellow-300 dark:hover:text-yellow-400' %>" 
+                                        data-rating="<%= i %>">
+                                    <% if (userRating && userRating >= i) { %>
+                                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                        </svg>
+                                    <% } else { %>
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                        </svg>
+                                    <% } %>
+                                </button>
+                                <% } %>
+                            </div>
+                            <% if (!user && allowGuestRating) { %>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
+                                <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <%- __('games.rating_guest', { loginLink: '<a href="/login" class="text-blue-500 hover:text-blue-600 px-1" system-nav>' + __('games.rating_login_text') + '</a>' }) %>
+                            </p>
+                            <% } %>
+                        </div>
+                        <% } %>
+                        
+                        <!-- Tags -->
+                        <% if (game.tags) { %>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <% game.tags.split(',').forEach(tag => { %>
+                                <% if (tag.trim()) { %>
+                                <a href="/games/tag/<%= encodeURIComponent(tag.trim()) %>" 
+                                   class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-xs font-medium transition" system-nav>
+                                   #<%= tag.trim() %>
+                                </a>
+                                <% } %>
+                            <% }); %>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Game Description -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+                        <h2 class="font-semibold text-gray-900 dark:text-gray-100 mb-2"><%= __('games.description') %></h2>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm"><%= game.description || game.short_description || __('games.no_comments') %></p>
+                    </div>
+                    
+                    <!-- Game Controls -->
+                    <% if (game.controls) { %>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4">
+                        <h2 class="font-semibold text-gray-900 dark:text-gray-100 mb-2"><%= __('games.controls') %></h2>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm"><%= game.controls %></p>
+                    </div>
+                    <% } %>
+                </aside>
+            </section>
+
+            <!-- Comments Section -->
+            <% if (enable_comments === '1') { %>
+            <section class="flex flex-col lg:flex-row gap-8">
+                <!-- Comments -->
+                <div class="flex-1 space-y-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6"><%= __('games.comments') %> (<span id="comment-count"><%= commentCount %></span>)</h2>
+
+                        <!-- Comment Form -->
+                        <% if (user) { %>
+                        <div class="mb-8">
+                            <div class="flex items-start space-x-3">
+                                <img src="<%= user.avatarUrl || `https://www.gravatar.com/avatar/${user.email}?d=identicon&s=40` %>" alt="<%= user.username %>"
+                                    class="w-10 h-10 rounded-full flex-shrink-0" />
+                                <div class="flex-1">
+                                    <textarea id="comment-text" placeholder="<%= __('games.write_comment') %>"
+                                        class="w-full p-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent resize-none"
+                                        rows="3"></textarea>
+                                    <div class="flex justify-between items-center mt-3">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <span id="char-count">0</span>/500 <%= __('games.character_count') %>
+                                        </div>
+                                        <button id="post-comment-btn"
+                                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200">
+                                            <%= __('games.post_comment') %>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } else { %>
+                        <div class="mb-8 text-center p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                            <p class="text-gray-600 dark:text-gray-300">
+                                <%= __('games.login_to_comment') %>
+                            </p>
+                        </div>
+                        <% } %>
+
+                        <!-- Comments List -->
+                        <div id="comments-list" class="space-y-6">
+                            <% if (comments && comments.length > 0) { %>
+                                <% comments.forEach(comment => { %>
+                                <div class="comment-item flex space-x-3">
+                                    <img src="<%= comment.avatar || `https://www.gravatar.com/avatar/default?d=identicon&s=40` %>" alt="<%= comment.username %>"
+                                        class="w-10 h-10 rounded-full flex-shrink-0" />
+                                    <div class="flex-1">
+                                        <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="font-medium text-gray-900 dark:text-gray-100"><%= comment.username %></span>
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                        <%= new Date(comment.created_at).toLocaleDateString('en-US', { 
+                                                            year: 'numeric', 
+                                                            month: 'short', 
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        }) %>
+                                                    </span>
+                                                </div>
+                                                <% if (user && user.id === comment.user_id) { %>
+                                                <button class="delete-comment-btn text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 text-sm" data-comment-id="<%= comment.id %>"
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                                </button>
+                                                <% } %>
+                                            </div>
+                                            <p class="text-gray-700 dark:text-gray-300 text-sm"><%= comment.comment %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <svg class="w-16 h-16 mb-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                    </svg>
+                                    <p><%= __('games.no_comments') %></p>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <!-- Load More Button -->
+                        <% if (commentCount > 5) { %>
+                        <div class="text-center mt-6">
+                            <button id="load-more-comments" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-full font-medium transition" data-offset="5"
+                                <%= __('games.load_more_comments') %>
+                            </button>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar -->
+                <aside class="w-full lg:w-80 flex-shrink-0 space-y-6">
+                    <!-- Game Leaderboard -->
+                    <% if ((game.game_type === 'html' || game.game_type === 'embed') && game.api_enabled) { %>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4"><%= __('games.leaderboard') %></h3>
+                        <div id="leaderboard-container">
+                            <div class="text-center py-4 text-gray-500 dark:text-gray-400" id="leaderboard-loading">
+                                <svg class="w-8 h-8 animate-spin mb-2" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-sm"><%= __('games.loading_leaderboard') %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+                    
+                    <!-- Sidebar Ad -->
+                    <div class="hidden lg:block">
+                        <% if (enable_frontend_pjax === '0') { %>
+                            <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                            <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: 'w-full' }) %>
+                        <% } else { %>
+                            <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                            <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: 'w-full' }) %>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Related Games -->
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4"><%= __('games.related_games') %></h3>
+                        <div class="space-y-4">
+                            <% if (relatedGames && relatedGames.length > 0) { %>
+                                <% relatedGames.forEach(relatedGame => { %>
+                                <a href="/play/<%= relatedGame.slug %>" system-nav class="flex space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors duration-200"
+                                    <% if (relatedGame.parsedThumbnail && relatedGame.parsedThumbnail.webp && relatedGame.parsedThumbnail.original) {
+                                        let webpImage = relatedGame.parsedThumbnail.webp.thumbnail || relatedGame.parsedThumbnail.webp.standard;
+                                        let originalImage = relatedGame.parsedThumbnail.original.thumbnail || relatedGame.parsedThumbnail.original.standard;
+                                        
+                                        if (webpImage && originalImage) { %>
+                                            <picture>
+                                                <source srcset="/<%= webpImage.relativePath %>" type="image/webp">
+                                                <img src="/<%= originalImage.relativePath %>" alt="<%= relatedGame.title %>" class="w-16 h-16 rounded-lg object-contain flex-shrink-0" loading="lazy">
+                                            </picture>
+                                        <% } else { %>
+                                            <img src="<%= relatedGame.thumbnail && relatedGame.thumbnail.startsWith('/') ? relatedGame.thumbnail : '/' + (relatedGame.thumbnail || '') %>" alt="<%= relatedGame.title %>" class="w-16 h-16 rounded-lg object-contain flex-shrink-0" loading="lazy">
+                                        <% }
+                                    } else if (relatedGame.thumbnail) { %>
+                                        <img src="<%= relatedGame.thumbnail.startsWith('/') ? relatedGame.thumbnail : '/' + relatedGame.thumbnail %>" alt="<%= relatedGame.title %>" class="w-16 h-16 rounded-lg object-contain flex-shrink-0" loading="lazy">
+                                    <% } else { %>
+                                        <div class="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                    <% } %>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-medium text-gray-900 dark:text-gray-100 text-sm truncate"><%= relatedGame.title %></h4>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            <% if (relatedGame.category_name) { %>
+                                                <%= relatedGame.category_name %> • 
+                                            <% } %>
+                                            <%= (relatedGame.play_count || 0).toLocaleString() %> <%= __('games.plays') %>
+                                        </p>
+                                    </div>
+                                </a>
+                                <% }); %>
+                            <% } else { %>
+                                <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                    <svg class="w-12 h-12 mb-2 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <p class="text-sm"><%= __('games.no_related_games') %></p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+            <% } %>
+        </main>
+    </div>
+
+    <%- include('../modules/footer.block.ejs', { page }) %>
+
+<%- include('../footer.ejs', { page }) %>

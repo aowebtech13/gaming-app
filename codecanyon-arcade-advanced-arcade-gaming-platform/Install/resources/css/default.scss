@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Animated gradient background for chatroom hero card */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  animation: gradient 8s ease infinite;
+}
+
+/* Avatar upload specific styles */
+.avatar-upload-container {
+  .avatar-preview {
+    transition: transform 0.2s ease-in-out;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+  
+  .avatar-overlay {
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .avatar-drop-zone {
+    transition: all 0.2s ease-in-out;
+    
+    &.drag-over {
+      @apply border-orange-400 bg-orange-50;
+      transform: scale(1.02);
+    }
+  }
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* 
+  Modal Size Classes - DO NOT REMOVE
+  These classes are used dynamically by JavaScript for modal sizing
+  Tailwind needs to detect them during build to include in final CSS
+*/
+.modal-sizes {
+  /* Ensure these classes are included in build */
+  @apply max-w-sm max-w-lg max-w-xl max-w-2xl max-w-4xl;
+  /* Also include modal- prefixed classes */
+  .modal-sm { display: none; }
+  .modal-md { display: none; }
+  .modal-lg { display: none; }
+  .modal-xl { display: none; }
+}
+
+/* Line clamp utilities for text truncation */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Masonry Grid Layout - ZERO GAPS */
+.masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(120px, auto);
+  gap: 0;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  @media (min-width: 1280px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.masonry-item {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  
+  /* Make every nth item span different heights for variety */
+  &:nth-child(3n+1) {
+    grid-row: span 2;
+  }
+  
+  &:nth-child(5n+2) {
+    grid-row: span 3;
+  }
+  
+  &:nth-child(7n+3) {
+    grid-row: span 1;
+  }
+  
+  &:nth-child(11n+4) {
+    grid-row: span 2;
+  }
+
+  /* Ensure link and content fill completely */
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+  }
+  
+  a > div {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Images fill completely */
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    line-height: 0;
+  }
+}
+
+/* Aspect ratio classes for Tailwind - DO NOT REMOVE */
+.aspect-ratios {
+  /* Ensure these aspect ratio classes are included in build */
+  @apply aspect-square aspect-[4/5] aspect-[3/4] aspect-[4/3] aspect-[5/4] aspect-[3/5] aspect-[5/3] aspect-[2/3];
+}
+
+/* Dark Mode Transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Prevent transition on initial load */
+.no-transitions * {
+  transition: none !important;
+}
+
+/* Category Icon Dark Mode Styling */
+.category-icon {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+  transition: filter 0.3s ease;
+  
+  @media (prefers-color-scheme: dark) {
+    filter: brightness(0) invert(1) drop-shadow(0 1px 1px rgba(255,255,255,0.1));
+  }
+}
+
+/* JavaScript-controlled dark mode - explicit light and dark states */
+:root .category-icon {
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+:root.dark .category-icon {
+  filter: brightness(0) invert(1) drop-shadow(0 1px 1px rgba(255,255,255,0.1));
+}
+
+/* Dynamic Tag Color Schemes for Dark Mode */
+.tag-blue { @apply bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100; }
+.tag-green { @apply bg-green-50 text-green-600 border-green-100 hover:bg-green-100; }
+.tag-purple { @apply bg-purple-50 text-purple-600 border-purple-100 hover:bg-purple-100; }
+.tag-pink { @apply bg-pink-50 text-pink-600 border-pink-100 hover:bg-pink-100; }
+.tag-yellow { @apply bg-yellow-50 text-yellow-600 border-yellow-100 hover:bg-yellow-100; }
+.tag-red { @apply bg-red-50 text-red-600 border-red-100 hover:bg-red-100; }
+.tag-indigo { @apply bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100; }
+.tag-cyan { @apply bg-cyan-50 text-cyan-600 border-cyan-100 hover:bg-cyan-100; }
+.tag-emerald { @apply bg-emerald-50 text-emerald-600 border-emerald-100 hover:bg-emerald-100; }
+.tag-orange { @apply bg-orange-50 text-orange-600 border-orange-100 hover:bg-orange-100; }
+.tag-teal { @apply bg-teal-50 text-teal-600 border-teal-100 hover:bg-teal-100; }
+.tag-rose { @apply bg-rose-50 text-rose-600 border-rose-100 hover:bg-rose-100; }
+
+:root.dark .tag-blue { @apply bg-blue-900/30 text-blue-400 border-blue-800 hover:bg-blue-900/50; }
+:root.dark .tag-green { @apply bg-green-900/30 text-green-400 border-green-800 hover:bg-green-900/50; }
+:root.dark .tag-purple { @apply bg-purple-900/30 text-purple-400 border-purple-800 hover:bg-purple-900/50; }
+:root.dark .tag-pink { @apply bg-pink-900/30 text-pink-400 border-pink-800 hover:bg-pink-900/50; }
+:root.dark .tag-yellow { @apply bg-yellow-900/30 text-yellow-400 border-yellow-800 hover:bg-yellow-900/50; }
+:root.dark .tag-red { @apply bg-red-900/30 text-red-400 border-red-800 hover:bg-red-900/50; }
+:root.dark .tag-indigo { @apply bg-indigo-900/30 text-indigo-400 border-indigo-800 hover:bg-indigo-900/50; }
+:root.dark .tag-cyan { @apply bg-cyan-900/30 text-cyan-400 border-cyan-800 hover:bg-cyan-900/50; }
+:root.dark .tag-emerald { @apply bg-emerald-900/30 text-emerald-400 border-emerald-800 hover:bg-emerald-900/50; }
+:root.dark .tag-orange { @apply bg-orange-900/30 text-orange-400 border-orange-800 hover:bg-orange-900/50; }
+:root.dark .tag-teal { @apply bg-teal-900/30 text-teal-400 border-teal-800 hover:bg-teal-900/50; }
+:root.dark .tag-rose { @apply bg-rose-900/30 text-rose-400 border-rose-800 hover:bg-rose-900/50; }
+
+/* Hall of Fame Animations */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0px); 
+  }
+  50% { 
+    transform: translateY(-10px); 
+  }
+}
+
+@keyframes shimmer {
+  0% { 
+    transform: translateX(-100%); 
+  }
+  100% { 
+    transform: translateX(100%); 
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delay-2 {
+  animation: float 3s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.animate-float-delay-4 {
+  animation: float 3s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.animate-float-delay-6 {
+  animation: float 3s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.animate-float-delay-8 {
+  animation: float 3s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+

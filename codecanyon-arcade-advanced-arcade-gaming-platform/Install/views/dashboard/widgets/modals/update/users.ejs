@@ -1,0 +1,112 @@
+<div class="p-6">
+    <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+            <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg><%= title %>
+        </h3>
+
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <form system-form class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.username') %></label>
+                <input type="text" name="username" required value="<%= data.user.username %>" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('auth.username_placeholder') %>">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.email') %></label>
+                <input type="email" name="email" required value="<%= data.user.email %>" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('auth.email_placeholder') %>">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.first_name') %></label>
+                <input type="text" name="first_name" value="<%= data.user.first_name || '' %>" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('auth.first_name_placeholder') %>">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.last_name') %></label>
+                <input type="text" name="last_name" value="<%= data.user.last_name || '' %>" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('auth.last_name_placeholder') %>">
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.password') %></label>
+            <input type="password" name="password_hash" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('auth.password_placeholder') %>"
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.country') %></label>
+                <div class="relative">
+                    <select name="country" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg system-country-select">
+                        <option value=""><%= __('auth.select_country') %></option>
+                        <% data.countries.forEach(function(country) { %>
+                            <option value="<%= country.code %>" <%= data.user.country === country.code ? 'selected' : '' %>><%= country.name %></option>
+                        <% }); %>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.date_of_birth') %></label>
+                <input type="date" name="date_of_birth" value="<%= data.user.date_of_birth ? data.user.date_of_birth.toISOString().split('T')[0] : '' %>" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('auth.bio') %></label>
+            <textarea name="bio" rows="3" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('auth.bio_placeholder') %>"><%= data.user.bio || '' %></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.user_type') %></label>
+                <% if (data.user.id === 1) { %>
+                    <input type="hidden" name="user_type" value="<%= data.user.user_type %>">
+                    <div class="block w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-500 cursor-not-allowed">
+                        Super Admin (Protected)
+                    </div>
+                <% } else { %>
+                    <select name="user_type" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                        <option value="user" <%= data.user.user_type === 'user' ? 'selected' : '' %>><%= __('forms.user') %></option>
+                        <option value="admin" <%= data.user.user_type === 'admin' ? 'selected' : '' %>><%= __('forms.admin') %></option>
+                    </select>
+                <% } %>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.status') %></label>
+                <% if (data.user.id === 1) { %>
+                    <input type="hidden" name="is_active" value="1">
+                    <div class="block w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-500 cursor-not-allowed">
+                        Always Active (Protected)
+                    </div>
+                <% } else { %>
+                    <select name="is_active" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                        <option value="1" <%= data.user.is_active ? 'selected' : '' %>><%= __('forms.active') %></option>
+                        <option value="0" <%= !data.user.is_active ? 'selected' : '' %>><%= __('forms.inactive') %></option>
+                    </select>
+                <% } %>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.verification') %></label>
+                <select name="is_verified" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                    <option value="0" <%= !data.user.is_verified ? 'selected' : '' %>><%= __('forms.unverified') %></option>
+                    <option value="1" <%= data.user.is_verified ? 'selected' : '' %>><%= __('forms.verified') %></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl hover:-translate-y-1">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><%= __('buttons.update_user') %>
+            </button>
+        </div>
+    </form>
+</div>

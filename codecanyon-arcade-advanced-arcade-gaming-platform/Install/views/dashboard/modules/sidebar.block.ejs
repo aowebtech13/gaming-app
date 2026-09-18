@@ -1,0 +1,369 @@
+<div id="sidebarContainer">
+    <div id="sidebarOverlay" class="fixed inset-0 z-40 bg-black/30 lg:hidden" style="display: none;"></div>
+    <aside id="sidebar"
+        class="lg:fixed lg:top-0 lg:left-0 lg:translate-x-0 lg:flex lg:w-72 lg:h-screen flex flex-col w-72 max-w-full bg-white/90 border-r border-gray-200/50 backdrop-blur-xl transition-transform duration-300 transform -translate-x-full z-[60] left-0 fixed inset-y-0 shadow-2xl lg:shadow-none">
+        <!-- Close button for mobile -->
+        <button id="sidebarCloseBtn"
+            class="absolute top-2 right-2 z-[70] flex items-center justify-center w-8 h-8 rounded-full bg-white shadow-xl lg:hidden hover:shadow-2xl transition-all duration-200"
+            style="display: none;">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <div class="flex h-full flex-col">
+            <!-- Logo Section -->
+            <div class="flex items-center justify-center px-4 pt-6 pb-4 bg-white/90 backdrop-blur-xl">
+                <% if (site_logo) { %>
+                    <%
+                    let logoData;
+                    try {
+                        logoData = typeof site_logo === 'string' && site_logo.startsWith('{') ? JSON.parse(site_logo) : null;
+                    } catch (e) {
+                        logoData = null;
+                    }
+                    %>
+                    <% if (logoData && logoData.webp && logoData.webp.standard) { %>
+                        <picture>
+                            <source srcset="/<%= logoData.webp.standard.relativePath %>" type="image/webp">
+                            <% if (logoData.original) { %>
+                                <source srcset="/<%= logoData.original.relativePath %>" type="image/<%= logoData.original.format %>">
+                            <% } %>
+                            <img src="/<%= logoData.webp.standard.relativePath %>" alt="<%= site_name || 'ARCADE' %> Logo" class="h-10 w-auto max-w-none" />
+                        </picture>
+                    <% } else { %>
+                        <img src="<%= site_logo.startsWith('/') ? site_logo : '/' + site_logo %>" alt="<%= site_name || 'ARCADE' %> Logo" class="h-10 w-auto max-w-none" />
+                    <% } %>
+                <% } else { %>
+                    <img src="/assets/images/logo.png" alt="<%= site_name || 'ARCADE' %> Logo" class="h-10 w-auto max-w-none" />
+                <% } %>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto px-4 pt-8 pb-6">
+                <!-- Main Section -->
+                <div class="mb-8">
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/overview"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition-all duration-200 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.overview') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/users"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 hover:text-emerald-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 transition-all duration-200 group-hover:bg-emerald-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.users') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/follows"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 hover:text-indigo-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-all duration-200 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.follows') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Games Management Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.games') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/games"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-600 transition-all duration-200 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.games') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/categories"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 hover:text-orange-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 text-orange-600 transition-all duration-200 group-hover:bg-orange-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.categories') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/favorites"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 hover:text-pink-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 text-pink-600 transition-all duration-200 group-hover:bg-pink-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.favorites') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/importer"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-teal-50 hover:to-cyan-50 hover:text-teal-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-100 text-teal-600 transition-all duration-200 group-hover:bg-teal-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.importer') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- EXP System Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.exp_system') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/exp_events"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-600 transition-all duration-200 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.exp_events') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/exp_ranks"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-orange-50 hover:text-yellow-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 transition-all duration-200 group-hover:bg-yellow-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.exp_ranks') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Advertisements Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.ad_management') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/ads"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-pink-50 hover:to-red-50 hover:text-pink-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-100 text-pink-600 transition-all duration-200 group-hover:bg-pink-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.advertisements') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/ad_placements"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-all duration-200 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.ad_placements') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Content Management Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.dynamic_content') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/comments"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 hover:text-amber-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 transition-all duration-200 group-hover:bg-amber-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.comments') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/pages"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 hover:text-cyan-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100 text-cyan-600 transition-all duration-200 group-hover:bg-cyan-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.pages') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Game Analytics Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.game_analytics') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/game_scores"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 hover:text-blue-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition-all duration-200 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.game_scores') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/game_leaderboards"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-yellow-50 hover:to-orange-50 hover:text-yellow-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 text-yellow-600 transition-all duration-200 group-hover:bg-yellow-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.leaderboards') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/search_queries"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-purple-50 hover:to-indigo-50 hover:text-purple-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-purple-600 transition-all duration-200 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.search_analytics') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- System Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.system') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/templates"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-all duration-200 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.templates') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- System Logs Section -->
+                <div class="mb-8">
+                    <div class="border-t border-gray-200/50 pt-6 mb-6"></div>
+                    <div class="px-3 mb-3">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider"><%= __('dashboard.section.system_logs') %></p>
+                    </div>
+                    <ul class="space-y-1">
+                        <li system-navbar>
+                            <a href="/dashboard/email_logs"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition-all duration-200 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.email_logs') %></span>
+                            </a>
+                        </li>
+                        <li system-navbar>
+                            <a href="/dashboard/cron_logs"
+                                class="group flex items-center gap-3 rounded-xl px-3 py-3 text-gray-700 transition-all duration-200 hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 hover:text-green-700 hover:shadow-lg"
+                                system-nav>
+                                <div
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 text-green-600 transition-all duration-200 group-hover:bg-green-600 group-hover:text-white group-hover:shadow-md">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <span class="font-medium"><%= __('dashboard.nav.cron_jobs') %></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </aside>
+</div>

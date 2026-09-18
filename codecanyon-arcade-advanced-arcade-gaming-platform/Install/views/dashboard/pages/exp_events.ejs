@@ -1,0 +1,97 @@
+<%- include('../header.ejs', { page }) %>
+
+<div class="flex min-h-screen bg-gray-50/50">
+    <!-- Sidebar -->
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <!-- Main area -->
+    <div class="flex-1 flex flex-col min-w-0" system-wrapper>
+        <!-- Header (topbar) -->
+        <%- include('../modules/header.block.ejs', { page }) %>
+        <!-- Main content -->
+        <div class="flex-1">
+            <!-- Page Header -->
+            <div class="border-b border-gray-200/50 bg-white/80 py-4 sm:py-6 lg:py-8 backdrop-blur-sm shadow-sm">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 shadow-xl">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl"><%= __('dashboard.exp_events.title') %></h1>
+                                <p class="text-xs sm:text-sm text-gray-500"><%= __('dashboard.exp_events.description') %></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <button system-toggle="update/settings_exp/none" class="group inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-2xl hover:-translate-y-1">
+                                <svg class="w-5 h-5 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                </svg>
+                                <span class="hidden sm:inline"><%= __('dashboard.exp_events.settings') %></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="mx-auto max-w-7xl px-4 py-4 sm:py-6 lg:py-8 sm:px-6 lg:px-8">
+                <!-- Data Table Card -->
+                <div class="overflow-hidden rounded-xl bg-white shadow-sm hover:shadow-xl transition-all duration-200">
+                    <div class="border-b border-gray-200/50 px-4 sm:px-6 py-4">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <!-- Rows per page selection - moved to far left -->
+                            <div class="relative">
+                                <select id="systemRowsPerPage" class="w-full sm:w-auto appearance-none rounded-lg border border-gray-300 bg-white px-3 sm:px-4 py-2 pr-8 text-xs sm:text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                                    <option value="10"><%= __('dashboard.common.show_items', { count: 10 }) %></option>
+                                    <option value="25"><%= __('dashboard.common.show_items', { count: 25 }) %></option>
+                                    <option value="50"><%= __('dashboard.common.show_items', { count: 50 }) %></option>
+                                    <option value="100"><%= __('dashboard.common.show_items', { count: 100 }) %></option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Search bar - moved to center/right -->
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                                    </svg>
+                                </div>
+                                <input type="text" id="systemSearchInput" class="w-full sm:w-64 rounded-lg border border-gray-300 bg-white pl-10 pr-4 py-2 text-xs sm:text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.exp_events.search_placeholder') %>">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="overflow-x-auto">
+                        <table id="systemTable" system-table="exp_events" class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50"></thead>
+                            <tbody class="divide-y divide-gray-200 bg-white"></tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="border-t border-gray-200/50 px-4 sm:px-6 py-4">
+                        <nav>
+                            <ul id="systemPagination" class="flex justify-center"></ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer - positioned at bottom -->
+        <%- include('../modules/footer.block.ejs', { page }) %>
+    </div>
+</div>
+
+<%- include('../footer.ejs', { page }) %>

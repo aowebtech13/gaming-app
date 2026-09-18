@@ -1,0 +1,36 @@
+    <!-- Preloader -->
+    <div class="preloader-light fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-sm" system-preloader>
+        <div class="flex flex-col items-center gap-4">
+            <div class="h-12 w-12 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600"></div>
+            <p class="text-sm font-medium text-gray-600"><%= __('common.loading') %></p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/assets/js/libs/fetch.min.js"></script>
+    
+    <!-- External Libraries -->
+    <script defer>
+        fetchInject([
+            "/assets/js/dashboard.min.js",
+            "/assets/js/importer.min.js",
+        ], fetchInject([
+            "/assets/js/functions.min.js",
+            "/assets/js/heroicons-picker.min.js"
+        ], fetchInject([
+            "/assets/js/libs/pjax.min.js",
+            "/assets/js/libs/topbar.min.js",
+            "/assets/js/libs/jquery.loading.min.js",
+            "/assets/js/libs/izitoast.min.js",
+            "/assets/js/libs/nodetable.titansys.js",
+            "/assets/js/libs/quill.min.js",
+        ], fetchInject([
+            "/assets/js/libs/jquery.min.js",
+            "/socket.io/socket.io.js",
+            "/assets/css/libs/izitoast.min.css",
+            "/assets/css/libs/quill.min.css",
+        ]))));
+    </script>
+</body>
+
+</html>

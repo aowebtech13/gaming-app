@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="<%= currentLanguage || 'en' %>"<% if (isRTL) { %> dir="rtl"<% } %>>
+
+<head>
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Favicon links -->
+    <% if (typeof site_favicon !== 'undefined' && site_favicon) { %>
+      <% 
+        let faviconData = null;
+        try {
+          if (typeof site_favicon === 'string' && site_favicon.startsWith('{')) {
+            faviconData = JSON.parse(site_favicon);
+          }
+        } catch(e) {
+          // Use fallback if JSON parsing fails
+        }
+        
+        if (faviconData && faviconData.webp && faviconData.original) {
+      %>
+        <!-- Modern WebP favicons -->
+        <link rel="icon" type="image/webp" sizes="16x16" href="/<%= faviconData.webp.small.relativePath %>">
+        <link rel="icon" type="image/webp" sizes="32x32" href="/<%= faviconData.webp.standard.relativePath %>">
+        
+        <!-- PNG fallbacks -->
+        <link rel="icon" type="image/png" sizes="16x16" href="/<%= faviconData.original.small.relativePath %>">
+        <link rel="icon" type="image/png" sizes="32x32" href="/<%= faviconData.original.standard.relativePath %>">
+        
+        <!-- Apple Touch Icon -->
+        <link rel="apple-touch-icon" sizes="180x180" href="/<%= faviconData.original.apple.relativePath %>">
+        
+        <!-- Android/PWA Icons -->
+        <link rel="icon" type="image/png" sizes="192x192" href="/<%= faviconData.original.android.relativePath %>">
+        <link rel="icon" type="image/png" sizes="512x512" href="/<%= faviconData.original.pwa.relativePath %>">
+        
+        <!-- Legacy ICO fallback -->
+        <link rel="shortcut icon" href="/<%= faviconData.original.standard.relativePath %>">
+      <% } else { %>
+        <!-- Simple favicon (legacy format) -->
+        <link rel="shortcut icon" href="<%= site_favicon.startsWith('/') ? site_favicon : '/' + site_favicon %>">
+      <% } %>
+    <% } else { %>
+      <!-- Default favicon -->
+      <link rel="shortcut icon" href="/assets/images/favicon.ico">
+    <% } %>
+
+    <title><%- title %></title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/assets/css/chatroom.min.css" rel="stylesheet">
+    
+    <!-- User data for WebSocket and JavaScript -->
+    <script>
+        window.user = <%-JSON.stringify(safeUser)%>;
+    </script>
+    
+    <!-- Translation system for client-side JavaScript -->
+    <script>
+        // Translation data and functions
+        window.TRANSLATIONS = <%-translationsJSON || '{}'%>;
+        window.CURRENT_LANGUAGE = '<%= currentLanguage || 'en' %>';
+        window.IS_RTL = <%= isRTL || false %>;
+        
+        // Global translation function for JavaScript
+        window.__ = function(key, variables) {
+            variables = variables || {};
+            
+            // Get nested translation value
+            function getNestedValue(obj, path) {
+                return path.split('.').reduce(function(current, key) {
+                    return current && current[key] !== undefined ? current[key] : undefined;
+                }, obj);
+            }
+            
+            // Get translation
+            var translation = getNestedValue(window.TRANSLATIONS, key);
+            
+            // Fallback to key if translation not found
+            if (translation === undefined) {
+                translation = key;
+            }
+            
+            // Replace variables in format {variable}
+            if (typeof translation === 'string') {
+                translation = translation.replace(/\{(\w+)\}/g, function(match, varKey) {
+                    return variables[varKey] !== undefined ? variables[varKey] : match;
+                });
+            }
+            
+            return translation;
+        };
+        
+        // Language information
+        window.LANGUAGE_INFO = {
+            current: '<%= currentLanguage || 'en' %>',
+            isRTL: <%= isRTL || false %>,
+            available: <%-JSON.stringify(availableLanguages || [])%>
+        };
+    </script>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen overflow-hidden">
+    <!-- Beautiful Loading Screen - shown by default -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="loading-logo-text">🎮</div>
+            </div>
+            
+            <h1 class="loading-title"><%= site_name || __('common.default_site_name') %></h1>
+            <p class="loading-subtitle"><%= __('chatroom.loading_3d') %></p>
+            
+            <div class="loading-progress-container">
+                <div class="loading-progress-bar">
+                    <div id="loadingProgressFill" class="loading-progress-fill" style="width: 5%;"></div>
+                </div>
+                <div id="loadingPercentage" class="loading-percentage">5%</div>
+            </div>
+            
+            <div id="loadingMessage" class="loading-message"><%= __('chatroom.starting_world') %></div>
+        </div>
+    </div>
+    <!-- Player Setup Modal -->
+    <div id="playerSetupModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-backdrop">
+        <div class="modal-glass rounded-2xl p-8 w-full max-w-sm mx-4">
+            <div class="text-center mb-6">
+                <h2 id="modalTitle" class="text-2xl font-bold glass-text mb-2"><%= __('chatroom.virtual_chat') %></h2>
+                <p id="modalDescription" class="glass-text opacity-90"><%= __('chatroom.select_character') %></p>
+            </div>
+            
+            <!-- User profile info will be inserted here for authenticated users -->
+            <div id="userProfileInfo" class="hidden"></div>
+            
+            <form id="playerSetupForm" class="space-y-4">
+                
+                <div id="characterSelectionContainer">
+                    <label for="charType" class="block text-sm font-medium glass-text mb-1"><%= __('user.character') %></label>
+                    <select id="charType" name="charType"
+                            class="glass-input w-full px-3 py-2 rounded-lg glass-text focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <!-- Options will be populated dynamically by JavaScript -->
+                    </select>
+                </div>
+                
+                <button type="submit" id="submitButton"
+                        class="btn-glass w-full py-3 glass-text font-semibold rounded-lg">
+                    <%= __('chatroom.enter_lounge') %>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Required Modal -->
+    <div id="loginRequiredModal" class="fixed inset-0 z-50 hidden flex items-center justify-center modal-backdrop">
+        <div class="modal-glass rounded-2xl p-8 w-full max-w-sm mx-4">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold glass-text mb-2"><%= __('auth.login_required') %></h2>
+                <p class="glass-text opacity-90"><%= __('chatroom.login_required_message') %></p>
+            </div>
+            
+            <div class="space-y-3">
+                <a href="/login" class="btn-glass w-full glass-text py-3 px-4 rounded-lg font-semibold text-center block">
+                    <%= __('auth.login') %>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3D Game Canvas -->
+    <div id="overlay" class="absolute inset-0 pointer-events-none z-10 w-full h-full overflow-hidden"></div>
+    
+    <main class="relative w-full h-screen">
+        <!-- Chat Container - Enhanced Glass UI for Chat History -->
+        <div id="chatContainer" class="fixed bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-md z-20 pointer-events-none">
+            <div class="glassmorphism rounded-lg p-4 mx-4">
+                <div id="chatHistory" class="space-y-2 max-h-48 overflow-y-auto">
+                    <!-- Chat messages will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Chat Input - Enhanced Glass UI -->
+        <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md z-20">
+            <div class="mx-4">
+                <div class="chat-input-container flex items-center rounded-full p-2">
+                    <input id="chatInput" type="text" placeholder="<%= __('chatroom.type_message') %>"
+                           class="glass-input flex-1 px-4 py-2 bg-transparent focus:outline-none" />
+                    <button id="sendBtn" class="btn-glass p-2 rounded-full">
+                        <svg class="w-5 h-5 glass-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Controls Info -->
+        <div id="controlsWidget" class="widget-glass fixed top-4 left-4 rounded-lg z-20 max-w-xs">
+            <!-- Header with toggle button -->
+            <div class="flex items-center justify-between p-3 cursor-pointer" onclick="toggleControls()">
+                <div class="flex items-center text-sm glass-text font-medium">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
+                    </svg>
+                    <%= __('chatroom.controls') %>
+                </div>
+                <svg id="controlsToggle" class="w-4 h-4 glass-text transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </div>
+            
+            <!-- Collapsible content -->
+            <div id="controlsContent" class="px-3 pb-3 text-sm glass-text">
+                <div class="space-y-0.5 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.movement') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">WASD</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.run') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">Shift</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.jump') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">Space</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.attack_1') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">G</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.attack_2') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">H</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.attack_3') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">J</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.shield') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">K</kbd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span><%= __('chatroom.teleport') %>:</span>
+                        <kbd class="px-1.5 py-0.5 glassmorphism rounded text-xs glass-text">T</kbd>
+                    </div>
+                </div>
+                
+                
+                <div class="mt-2 pt-2 border-t border-white/20 dark:border-gray-400/20 text-xs opacity-80">
+                    <div>💬 <%= __('chatroom.click_names_profiles') %></div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Online Players List -->
+        <div class="widget-glass fixed bottom-4 right-4 rounded-lg p-3 z-20 max-w-xs">
+            <div class="text-sm glass-text">
+                <div class="font-medium mb-2 flex items-center justify-between">
+                    <span><%= __('chatroom.online_players') %></span>
+                    <span id="onlineCount" class="text-xs glassmorphism px-2 py-1 rounded ml-2 glass-text">0</span>
+                </div>
+                <div id="playersList" class="space-y-1 text-xs max-h-32 overflow-y-auto">
+                    <!-- Players will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Right Controls: Dark Mode Toggle and Exit Button -->
+        <div class="fixed top-4 right-4 z-20 flex space-x-2">
+            <!-- Dark Mode Toggle Button -->
+            <button id="chatroomDarkModeToggle" class="btn-glass p-2 rounded-lg">
+                <!-- Sun icon (shown in dark mode) -->
+                <svg class="w-5 h-5 glass-text hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <!-- Moon icon (shown in light mode) -->
+                <svg class="w-5 h-5 glass-text block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+            
+            <!-- Exit Button -->
+            <a href="/" class="btn-glass block p-2 rounded-lg">
+                <svg class="w-5 h-5 glass-text" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </a>
+        </div>
+
+        <!-- User Profile Modal -->
+        <div id="userProfileModal" class="fixed inset-0 z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="closeUserProfile()"></div>
+                <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white"><%= __('user.player_profile') %></h3>
+                        <button onclick="closeUserProfile()" class="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="userProfileContent">
+                        <!-- Profile content will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Error Modal Template -->
+        <div id="errorModalTemplate" class="fixed inset-0 z-50 hidden" data-error-modal="true">
+            <div class="modal-backdrop absolute inset-0"></div>
+            <div class="relative modal-glass rounded-2xl max-w-md w-full mx-4 p-6" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <h3 id="errorModalTitle" class="text-xl font-bold glass-text mb-2"><%= __('errors.error') %></h3>
+                    <p id="errorModalMessage" class="glass-text opacity-90"><%= __('errors.something_wrong') %></p>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button id="errorModalHomeBtn" class="btn-glass flex-1 glass-text py-3 px-4 rounded-lg font-medium flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <%= __('nav.homepage') %>
+                    </button>
+                    <button id="errorModalRetryBtn" class="btn-glass flex-1 glass-text py-3 px-4 rounded-lg font-medium flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <%= __('common.retry') %>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/assets/js/libs/fetch.min.js"></script>
+
+    <!-- External Libraries -->
+    <script defer>
+        fetchInject([
+            "/assets/js/chatroom.client.min.js",
+        ], fetchInject([
+            "/assets/js/chatroom.functions.min.js"
+        ], fetchInject([
+            "/assets/js/libs/jquery.min.js",
+            "/assets/js/libs/three.min.js",
+            "/socket.io/socket.io.js"
+        ])));
+    </script>
+</body>
+
+</html>

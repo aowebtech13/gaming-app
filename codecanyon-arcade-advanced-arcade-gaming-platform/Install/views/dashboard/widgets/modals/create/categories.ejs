@@ -1,0 +1,88 @@
+<div class="p-6">
+    <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+            <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg><%= title %>
+        </h3>
+
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+
+    <form system-form class="mt-4 space-y-4" enctype="multipart/form-data">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.name') %></label>
+                <input type="text" name="name" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('forms.name_placeholder') %>">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.slug') %> <span class="text-gray-500 text-xs"><%= __('games.slug_optional') %></span></label>
+                <input type="text" name="slug" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.slug_auto_generated') %>">
+                <p class="mt-1 text-xs text-gray-500"><%= __('forms.slug_help_category') %></p>
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.description') %></label>
+            <textarea name="description" rows="3" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('forms.description_placeholder') %>"></textarea>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.icon') %></label>
+            <input type="hidden" name="icon" id="iconInput">
+            <div id="heroicons-picker-container"></div>
+            <p class="mt-1 text-xs text-gray-500"><%= __('forms.icon_help') %></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.image') %></label>
+                <input type="file" name="image" accept="image/*" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                <p class="mt-1 text-xs text-gray-500"><%= __('forms.category_image_help') %></p>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.color') %></label>
+                <div class="space-y-3">
+                    <!-- Preset Colors -->
+                    <div class="grid grid-cols-6 gap-2">
+                        <button type="button" class="preset-color w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-gray-500 transition-colors duration-200 bg-blue-500" data-color="#3B82F6" title="Blue"></button>
+                        <button type="button" class="preset-color w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-gray-500 transition-colors duration-200 bg-green-500" data-color="#10B981" title="Green"></button>
+                        <button type="button" class="preset-color w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-gray-500 transition-colors duration-200 bg-yellow-500" data-color="#F59E0B" title="Yellow"></button>
+                        <button type="button" class="preset-color w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-gray-500 transition-colors duration-200 bg-purple-500" data-color="#8B5CF6" title="Purple"></button>
+                        <button type="button" class="preset-color w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-gray-500 transition-colors duration-200 bg-red-500" data-color="#EF4444" title="Red"></button>
+                        <button type="button" class="preset-color w-8 h-8 rounded-lg border-2 border-gray-300 hover:border-gray-500 transition-colors duration-200 bg-indigo-500" data-color="#6366F1" title="Indigo"></button>
+                    </div>
+                    
+                    <!-- Custom Color Picker -->
+                    <div class="flex gap-2">
+                        <input type="color" name="color" value="#3B82F6" class="h-10 w-16 rounded-lg border border-gray-300 bg-white shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                        <input type="text" id="colorInput" value="#3B82F6" class="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="#3B82F6">
+                    </div>
+                </div>
+                <p class="mt-1 text-xs text-gray-500"><%= __('forms.color_help') %></p>
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.status') %></label>
+            <select name="is_active" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                <option value="1"><%= __('forms.active') %></option>
+                <option value="0"><%= __('forms.inactive') %></option>
+            </select>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl hover:-translate-y-1">
+                <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg><%= __('buttons.create_category') %>
+            </button>
+        </div>
+    </form>
+</div>

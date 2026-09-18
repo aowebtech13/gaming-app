@@ -1,0 +1,182 @@
+<%- include('../header.ejs', { page }) %>
+
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <%- include('../modules/header.block.ejs', { page }) %>
+
+    <div system-wrapper>
+        <!-- Header Banner Ad -->
+        <div class="bg-gray-50/30 dark:bg-gray-800/30 border-b border-gray-200/50 dark:border-gray-700/50 py-4">
+            <div class="container mx-auto px-4 sm:px-6 flex justify-center">
+                <% if (enable_frontend_pjax === '0') { %>
+                    <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile header ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } else { %>
+                    <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile header ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- main content -->
+        <main class="container mx-auto px-4 sm:px-6 py-6 lg:py-8 space-y-8">
+            
+            <!-- Page Header -->
+            <div class="text-center space-y-4">
+                <div class="flex items-center justify-center space-x-3">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 shadow-xl">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100"><%= __('leaderboard.title') %></h1>
+                </div>
+                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"><%= __('leaderboard.description') %></p>
+            </div>
+
+            <!-- Period Tabs -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+                <div class="border-b border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-700/50">
+                    <nav class="flex">
+                        <button id="tab-all-time" class="leaderboard-tab flex-1 px-6 py-4 text-sm font-medium text-center transition-all duration-200 border-b-2 border-transparent hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-500 dark:border-blue-600" data-period="all-time">
+                            <div class="flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span><%= __('leaderboard.all_time') %></span>
+                            </div>
+                        </button>
+                        <button id="tab-monthly" class="leaderboard-tab flex-1 px-6 py-4 text-sm font-medium text-center transition-all duration-200 border-b-2 border-transparent hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600 text-gray-500 dark:text-gray-400" data-period="monthly">
+                            <div class="flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span><%= __('leaderboard.monthly') %></span>
+                            </div>
+                        </button>
+                        <button id="tab-weekly" class="leaderboard-tab flex-1 px-6 py-4 text-sm font-medium text-center transition-all duration-200 border-b-2 border-transparent hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-600 text-gray-500 dark:text-gray-400" data-period="weekly">
+                            <div class="flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                                <span><%= __('leaderboard.weekly') %></span>
+                            </div>
+                        </button>
+                    </nav>
+                </div>
+
+
+                <!-- Loading State -->
+                <div id="leaderboard-loading" class="hidden p-8 text-center">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
+                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-300"><%= __('leaderboard.loading') %></p>
+                </div>
+
+                <!-- Leaderboard Content -->
+                <div id="leaderboard-content" class="p-6">
+                    <div class="space-y-4">
+                        <% if (leaderboard && leaderboard.length > 0) { %>
+                            <% leaderboard.forEach((player, index) => { %>
+                                <div class="flex items-center space-x-4 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 <%= index < 3 ? 'ring-2 ring-yellow-200 dark:ring-yellow-400/50 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20' : '' %>">
+                                    <!-- Rank -->
+                                    <div class="flex-shrink-0 text-center">
+                                        <% if (index === 0) { %>
+                                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                            </div>
+                                        <% } else if (index === 1) { %>
+                                            <div class="w-10 h-10 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                            </div>
+                                        <% } else if (index === 2) { %>
+                                            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="w-10 h-10 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300 font-bold text-lg">
+                                                #<%= player.rank %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+
+                                    <!-- Player Avatar -->
+                                    <div class="flex-shrink-0">
+                                        <img src="<%= player.avatarUrl %>" alt="<%= player.displayName %>" class="w-14 h-14 rounded-full border-2 border-gray-200 dark:border-gray-600 object-cover">
+                                    </div>
+
+                                    <!-- Player Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2">
+                                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate"><%= player.displayName %></h3>
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">@<%= player.username %></span>
+                                        </div>
+                                        <div class="flex items-center space-x-4 mt-1 text-sm text-gray-600 dark:text-gray-300">
+                                            <span><%= __('leaderboard.level') %>: <strong><%= player.level.toLocaleString() %></strong></span>
+                                            <span><%= __('leaderboard.current_exp') %>: <strong><%= player.exp_points.toLocaleString() %></strong></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Total EXP -->
+                                    <div class="flex-shrink-0 text-right">
+                                        <div class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= player.total_exp_earned.toLocaleString() %></div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400"><%= __('leaderboard.total_exp') %></div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="text-center py-12">
+                                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+                                    <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"><%= __('leaderboard.no_players') %></h3>
+                                <p class="text-gray-500 dark:text-gray-400"><%= __('leaderboard.no_players_desc') %></p>
+                            </div>
+                        <% } %>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer Banner Ad -->
+        <div class="bg-gray-50/30 dark:bg-gray-800/30 border-t border-gray-200/50 dark:border-gray-700/50 py-6">
+            <div class="container mx-auto px-4 sm:px-6 flex justify-center">
+                <% if (enable_frontend_pjax === '0') { %>
+                    <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'footer-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile footer ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } else { %>
+                    <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'footer-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile footer ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- overlay for sidebar -->
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"></div>
+    </div>
+
+    <%- include('../modules/footer.block.ejs', { page }) %>
+
+<%- include('../footer.ejs', { page }) %>

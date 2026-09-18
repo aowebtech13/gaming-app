@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2025-08-20T16:09:07.108Z",
+  "gameCount": 1,
+  "games": [
+    {
+      "id": 1,
+      "title": "wewewe",
+      "slug": "wewewe"
+    }
+  ],
+  "dimensions": {
+    "width": 1200,
+    "height": 630
+  },
+  "gridLayout": {
+    "cols": 1,
+    "rows": 1
+  }
+}

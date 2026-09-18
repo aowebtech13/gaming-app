@@ -1,0 +1,101 @@
+<div class="p-6">
+    <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+            <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h4a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 010-2h4z"></path>
+            </svg><%= title %>
+        </h3>
+
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </div>
+
+    <form system-form class="mt-4 space-y-4" enctype="multipart/form-data">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.placement_name') %></label>
+                <input type="text" name="name" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.widgets.create.ad_placements.placement_name_placeholder') %>">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.slug') %> <span class="text-gray-500 text-xs">(optional)</span></label>
+                <input type="text" name="slug" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.widgets.create.ad_placements.slug_placeholder') %>">
+                <p class="mt-1 text-xs text-gray-500"><%= __('dashboard.widgets.create.ad_placements.slug_help') %></p>
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.description') %></label>
+            <textarea name="description" rows="3" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.widgets.create.ad_placements.description_placeholder') %>"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.width') %></label>
+                <input type="number" name="width" required min="1" max="2000" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.widgets.create.ad_placements.width_placeholder') %>">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.height') %></label>
+                <input type="number" name="height" required min="1" max="2000" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.widgets.create.ad_placements.height_placeholder') %>">
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.placement_type') %></label>
+            <select name="placement_type" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                <option value=""><%= __('dashboard.widgets.create.ad_placements.select_type') %>...</option>
+                <option value="banner"><%= __('dashboard.widgets.create.ad_placements.banner_type') %> (Website banners)</option>
+                <option value="emulator">EmulatorJS (ROM games)</option>
+                <option value="flash">Flash/Ruffle (Flash games)</option>
+                <option value="game-api">Game API (HTML5 games)</option>
+            </select>
+            <p class="mt-1 text-xs text-gray-500"><%= __('dashboard.widgets.create.ad_placements.placement_type_help') %></p>
+        </div>
+
+        <div class="bg-blue-50 p-4 rounded-lg">
+            <h4 class="text-sm font-medium text-blue-900 mb-2"><%= __('dashboard.widgets.create.ad_placements.common_sizes_title') %></h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-blue-700">
+                <div class="flex justify-between">
+                    <span><%= __('dashboard.widgets.create.ad_placements.size_leaderboard') %>:</span>
+                    <span>728x90</span>
+                </div>
+                <div class="flex justify-between">
+                    <span><%= __('dashboard.widgets.create.ad_placements.size_rectangle') %>:</span>
+                    <span>300x250</span>
+                </div>
+                <div class="flex justify-between">
+                    <span><%= __('dashboard.widgets.create.ad_placements.size_large_rectangle') %>:</span>
+                    <span>336x280</span>
+                </div>
+                <div class="flex justify-between">
+                    <span><%= __('dashboard.widgets.create.ad_placements.size_skyscraper') %>:</span>
+                    <span>160x600</span>
+                </div>
+                <div class="flex justify-between">
+                    <span><%= __('dashboard.widgets.create.ad_placements.size_interstitial') %>:</span>
+                    <span>320x480</span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.create.ad_placements.active') %></label>
+            <select name="is_active" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                <option value="1"><%= __('dashboard.widgets.create.ad_placements.active_option') %></option>
+                <option value="0"><%= __('dashboard.widgets.create.ad_placements.inactive_option') %></option>
+            </select>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl hover:-translate-y-1">
+                <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg><%= __('dashboard.widgets.create.ad_placements.submit_button') %>
+            </button>
+        </div>
+    </form>
+</div>

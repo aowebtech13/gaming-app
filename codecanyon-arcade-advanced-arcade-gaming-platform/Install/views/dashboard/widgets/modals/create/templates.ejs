@@ -1,0 +1,45 @@
+<div class="p-6">
+    <div class="flex items-start justify-between mb-6">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                <%= title %>
+            </h3>
+            <p class="text-sm text-gray-500 mt-1"><%= __('dashboard.template_manager.upload_description') %></p>
+        </div>
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200" onclick="system.hideModal()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Upload Form -->
+    <form system-form class="space-y-6">
+        <!-- File Upload -->
+        <div>
+            <label class="mb-2 block text-sm font-medium text-gray-700">
+                <%= __('dashboard.template_manager.template_file') %>
+            </label>
+            <input type="file" name="template_file" accept=".zip" required
+                   class="block w-full rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-700 transition-all duration-200 hover:border-teal-400 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20">
+            <p class="mt-2 text-xs text-gray-500">
+                <%= __('dashboard.template_manager.file_requirements') %>
+            </p>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+            <button type="button" onclick="system.hideModal()" 
+                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <%= __('forms.cancel') %>
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-teal-600 to-cyan-600 rounded-lg hover:from-teal-700 hover:to-cyan-700 transition-all duration-200 shadow-md hover:shadow-lg">
+                <%= __('dashboard.template_manager.upload_template') %>
+            </button>
+        </div>
+    </form>
+</div>

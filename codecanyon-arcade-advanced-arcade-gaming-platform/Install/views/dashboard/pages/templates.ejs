@@ -1,0 +1,199 @@
+<%- include('../header.ejs', { page }) %>
+
+<div class="flex min-h-screen bg-gray-50/50">
+    <!-- Sidebar -->
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <!-- Main area -->
+    <div class="flex-1 flex flex-col min-w-0" system-wrapper>
+        <!-- Header (topbar) -->
+        <%- include('../modules/header.block.ejs', { page }) %>
+        <!-- Main content -->
+        <div class="flex-1">
+            <!-- Page Header -->
+            <div class="border-b border-gray-200/50 bg-white/80 py-4 sm:py-6 lg:py-8 backdrop-blur-sm shadow-sm">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl"><%= __('dashboard.page_titles.templates.title') %></h1>
+                                <p class="text-xs sm:text-sm text-gray-500"><%= __('dashboard.page_titles.templates.description') %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <button id="rebuildAssetsBtn" class="group inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-orange-700 hover:to-amber-700 hover:shadow-2xl hover:-translate-y-1" title="<%= __('dashboard.template_manager.rebuild_assets') %>">
+                                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span class="hidden sm:inline"><%= __('dashboard.template_manager.rebuild_assets') %></span>
+                                <span class="sm:hidden"><%= __('dashboard.common.rebuild') %></span>
+                            </button>
+                            <button class="group inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-teal-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1" title="<%= __('dashboard.template_manager.upload_template') %>" system-toggle="create/templates">
+                                <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                </svg>
+                                <span class="hidden sm:inline"><%= __('dashboard.template_manager.upload_template') %></span>
+                                <span class="sm:hidden"><%= __('dashboard.common.upload') %></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="mx-auto max-w-7xl px-4 py-4 sm:py-6 lg:py-8 sm:px-6 lg:px-8">
+                <!-- Templates Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <% templates.forEach(template => { %>
+                        <div class="group relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-105 <%= selectedTemplate === template.id ? 'ring-4 ring-indigo-400 ring-opacity-60 shadow-indigo-100' : 'hover:border-gray-200' %>">
+                            <!-- Gradient Overlay for Active -->
+                            <% if (selectedTemplate === template.id) { %>
+                                <div class="absolute inset-0 bg-gradient-to-br from-indigo-50/20 to-purple-50/20 pointer-events-none z-10"></div>
+                            <% } %>
+                            
+                            <!-- Template Preview -->
+                            <div class="relative aspect-video bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 flex items-center justify-center overflow-hidden">
+                                <% if (template.preview_image) { %>
+                                    <img src="<%= template.preview_image %>" alt="<%= template.name %> Preview" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                    <!-- Image Overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <% } else { %>
+                                    <!-- Enhanced Placeholder -->
+                                    <div class="flex flex-col items-center justify-center text-gray-400 group-hover:text-gray-600 transition-all duration-300">
+                                        <div class="relative mb-3">
+                                            <svg class="w-16 h-16 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                                            </svg>
+                                            <div class="absolute inset-0 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                        </div>
+                                        <p class="text-sm font-medium tracking-wide"><%= __('dashboard.template_manager.preview_available') %></p>
+                                    </div>
+                                <% } %>
+                                
+                                <!-- Enhanced Active Badge -->
+                                <% if (selectedTemplate === template.id) { %>
+                                    <div class="absolute top-4 right-4 z-20">
+                                        <div class="relative">
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg backdrop-blur-sm">
+                                                <svg class="w-3 h-3 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                                <%= __('dashboard.template_manager.currently_active') %>
+                                            </span>
+                                            <div class="absolute inset-0 bg-emerald-400 rounded-full blur-md opacity-30 animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                <% } else if (template.id !== 'default') { %>
+                                    <!-- Floating Delete Button (not shown for default template) -->
+                                    <div class="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        <button class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200" title="<%= __('dashboard.template_manager.delete_template') %>" template-delete="templates/<%= template.id %>">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                <% } %>
+                                
+                                <!-- Hover Shine Effect -->
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                            </div>
+                            
+                            <!-- Enhanced Template Info -->
+                            <div class="relative p-6 bg-white z-20">
+                                <!-- Template Title -->
+                                <div class="mb-4">
+                                    <h3 class="text-xl font-bold text-gray-900 group-hover:text-indigo-700 transition-colors duration-300">
+                                        <%= template.name %>
+                                    </h3>
+                                    <div class="w-12 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 mt-2 transition-all duration-300 group-hover:w-16"></div>
+                                </div>
+                                
+                                <!-- Enhanced Info Grid -->
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 transition-colors duration-200 group-hover:bg-indigo-50/50">
+                                        <span class="text-gray-600 font-medium flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+<%= __('dashboard.template_manager.author') %>
+                                        </span>
+                                        <% if (template.author_url) { %>
+                                            <a href="<%= template.author_url %>" target="_blank" rel="noopener noreferrer" class="font-semibold text-indigo-600 hover:text-indigo-800 transition-all duration-200 hover:scale-105">
+                                                <%= template.author %>
+                                            </a>
+                                        <% } else { %>
+                                            <span class="font-semibold text-gray-800"><%= template.author %></span>
+                                        <% } %>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50/50 transition-colors duration-200 group-hover:bg-indigo-50/50">
+                                        <span class="text-gray-600 font-medium flex items-center">
+                                            <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                            </svg>
+<%= __('dashboard.template_manager.version') %>
+                                        </span>
+                                        <span class="font-mono text-sm bg-gray-200 px-2 py-1 rounded-md font-semibold text-gray-800">
+                                            v<%= template.version %>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Enhanced Action Buttons -->
+                                <div class="mt-6 flex gap-3">
+                                    <% if (selectedTemplate === template.id) { %>
+                                        <button class="flex-1 group/btn relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 cursor-default">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                                            <svg class="w-5 h-5 relative z-10" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span class="relative z-10"><%= __('dashboard.template_manager.active') %></span>
+                                        </button>
+                                    <% } else { %>
+                                        <button class="activate-template-btn flex-1 group/btn relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 px-4 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105" data-template-id="<%= template.id %>">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                                            <svg class="w-5 h-5 relative z-10 transition-transform duration-300 group-hover/btn:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            <span class="relative z-10"><%= __('dashboard.template_manager.activate') %></span>
+                                        </button>
+                                    <% } %>
+                                    
+                                    <% if (template.preview_url) { %>
+                                        <a href="<%= template.preview_url %>" target="_blank" rel="noopener noreferrer" class="group/preview inline-flex items-center justify-center w-12 h-12 rounded-xl border-2 border-gray-200 bg-white text-gray-600 shadow-md transition-all duration-300 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 hover:shadow-lg hover:scale-110" title="<%= __('dashboard.template_manager.preview_template') %>">
+                                            <svg class="w-5 h-5 transition-transform duration-300 group-hover/preview:scale-125" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </a>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+                
+                <!-- Empty State -->
+                <% if (!templates || templates.length === 0) { %>
+                    <div class="text-center py-12">
+                        <div class="mx-auto max-w-md">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z" />
+                            </svg>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900"><%= __('dashboard.template_manager.no_templates_found') %></h3>
+                            <p class="mt-2 text-sm text-gray-500"><%= __('dashboard.template_manager.no_templates_description') %></p>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../footer.ejs', { page }) %>

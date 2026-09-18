@@ -1,0 +1,271 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Font */
+body { 
+  font-family: 'Inter', sans-serif; 
+}
+
+/* Glass Effects */
+.glass-effect { 
+  backdrop-filter: blur(10px); 
+  background: rgba(255, 255, 255, 0.1); 
+}
+
+.glass-effect-dark { 
+  backdrop-filter: blur(10px); 
+  background: rgba(0, 0, 0, 0.1); 
+}
+
+/* Smooth scrolling */
+html { 
+  scroll-behavior: smooth; 
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { 
+  width: 8px; 
+  height: 8px; 
+}
+
+::-webkit-scrollbar-track { 
+  background: transparent; 
+}
+
+::-webkit-scrollbar-thumb { 
+  background: rgba(156, 163, 175, 0.5); 
+  border-radius: 4px; 
+}
+
+::-webkit-scrollbar-thumb:hover { 
+  background: rgba(156, 163, 175, 0.8); 
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-thumb { 
+  background: rgba(75, 85, 99, 0.5); 
+}
+
+.dark ::-webkit-scrollbar-thumb:hover { 
+  background: rgba(75, 85, 99, 0.8); 
+}
+
+/* 
+  Modal Size Classes - DO NOT REMOVE
+  These classes are used dynamically by JavaScript for modal sizing
+  Tailwind needs to detect them during build to include in final CSS
+*/
+.modal-sizes {
+  /* Ensure these classes are included in build */
+  @apply max-w-sm max-w-lg max-w-xl max-w-2xl max-w-4xl;
+  /* Also include modal- prefixed classes */
+  .modal-sm { display: none; }
+  .modal-md { display: none; }
+  .modal-lg { display: none; }
+  .modal-xl { display: none; }
+}
+
+/* Modal Scrolling */
+#systemModalContainer {
+  overflow-y: auto;
+}
+
+#systemModalDialog {
+  margin: 2rem auto;
+  max-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+}
+
+#systemModalContent {
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure form content can scroll while maintaining header/footer positioning */
+#systemModalContent > .p-6 {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Make the form container scrollable */
+#systemModalContent form.space-y-4 {
+  max-height: calc(100vh - 12rem);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Style the scrollbar in modal */
+#systemModalContent ::-webkit-scrollbar {
+  width: 6px;
+}
+
+#systemModalContent ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+#systemModalContent ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+#systemModalContent ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Responsive modal spacing */
+@media (max-width: 640px) {
+  #systemModalDialog {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
+  
+  #systemModalContent {
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+/* Focus styles */
+.focus-ring:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(70, 95, 255, 0.5);
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: .5; 
+  }
+}
+
+.animate-pulse { 
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; 
+}
+
+/* Desktop Layout Adjustments for Fixed Sidebar */
+@media (min-width: 1024px) {
+  /* Adjust main content to account for fixed sidebar */
+  body {
+    padding-left: 18rem; /* 72 * 0.25rem = 18rem */
+  }
+  
+  /* Fixed sidebar positioning */
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    width: 18rem !important; /* lg:w-72 = 18rem */
+    z-index: 60 !important;
+  }
+}
+
+/* Mobile Sidebar Styles */
+@media (max-width: 1023px) {
+  /* Remove padding on mobile */
+  body {
+    padding-left: 0 !important;
+  }
+  
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 60 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease-in-out !important;
+  }
+  
+  #sidebar.translate-x-0 {
+    transform: translateX(0) !important;
+  }
+  
+  #sidebarOverlay {
+    z-index: 50 !important;
+  }
+  
+  #sidebarCloseBtn {
+    z-index: 70 !important;
+  }
+  
+  /* Prevent body scroll when sidebar is open */
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+
+/* Enhanced Sidebar Scrollbar - Hide by default, show on hover */
+#sidebar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+#sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+#sidebar nav {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+#sidebar nav::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Show scrollbar on sidebar hover */
+#sidebar:hover {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent; /* Firefox */
+}
+
+#sidebar:hover::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+#sidebar:hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#sidebar:hover::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 3px;
+}
+
+#sidebar:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}
+
+#sidebar:hover nav {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent; /* Firefox */
+}
+
+#sidebar:hover nav::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+#sidebar:hover nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#sidebar:hover nav::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 3px;
+}
+
+#sidebar:hover nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
+}

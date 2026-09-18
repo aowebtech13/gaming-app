@@ -1,0 +1,212 @@
+{
+  "info": {
+    "name": "Fighter",
+    "displayName": "Fighter",
+    "description": "A strong and resilient warrior, skilled in close combat and defensive tactics.",
+    "category": "melee",
+    "stats": {
+      "health": 100,
+      "attack": 85,
+      "defense": 90,
+      "speed": 70,
+      "agility": 65
+    }
+  },
+  "display": {
+    "scale": {
+      "x": 2,
+      "y": 2,
+      "z": 1
+    },
+    "spriteHeight": 2,
+    "pixelPerfect": true,
+    "alphaTest": 0.1
+  },
+  "animations": {
+    "frameRate": 80,
+    "defaultAnimation": "Idle",
+    "states": {
+      "Idle": {
+        "type": "sheet",
+        "file": "Idle.png",
+        "frames": 6,
+        "duration": 480,
+        "loop": true,
+        "priority": 0
+      },
+      "Idle_Left": {
+        "type": "sheet",
+        "file": "Idle_Left.png",
+        "frames": 6,
+        "duration": 480,
+        "loop": true,
+        "priority": 0
+      },
+      "Walk": {
+        "type": "sheet",
+        "file": "Walk.png",
+        "frames": 8,
+        "duration": 640,
+        "loop": true,
+        "priority": 1
+      },
+      "Walk_Left": {
+        "type": "sheet",
+        "file": "Walk_Left.png",
+        "frames": 8,
+        "duration": 640,
+        "loop": true,
+        "priority": 1
+      },
+      "Run": {
+        "type": "sheet",
+        "file": "Run.png",
+        "frames": 8,
+        "duration": 640,
+        "loop": true,
+        "priority": 2
+      },
+      "Run_Left": {
+        "type": "sheet",
+        "file": "Run_Left.png",
+        "frames": 8,
+        "duration": 640,
+        "loop": true,
+        "priority": 2
+      },
+      "Attack_1": {
+        "type": "sheet",
+        "file": "Attack_1.png",
+        "frames": 4,
+        "duration": 600,
+        "loop": false,
+        "priority": 10,
+        "returnTo": "Idle"
+      },
+      "Attack_1_Left": {
+        "type": "sheet",
+        "file": "Attack_1_Left.png",
+        "frames": 4,
+        "duration": 600,
+        "loop": false,
+        "priority": 10,
+        "returnTo": "Idle_Left"
+      },
+      "Attack_2": {
+        "type": "sheet",
+        "file": "Attack_2.png",
+        "frames": 3,
+        "duration": 700,
+        "loop": false,
+        "priority": 10,
+        "returnTo": "Idle"
+      },
+      "Attack_2_Left": {
+        "type": "sheet",
+        "file": "Attack_2_Left.png",
+        "frames": 3,
+        "duration": 700,
+        "loop": false,
+        "priority": 10,
+        "returnTo": "Idle_Left"
+      },
+      "Attack_3": {
+        "type": "sheet",
+        "file": "Attack_3.png",
+        "frames": 4,
+        "duration": 600,
+        "loop": false,
+        "priority": 10,
+        "returnTo": "Idle"
+      },
+      "Attack_3_Left": {
+        "type": "sheet",
+        "file": "Attack_3_Left.png",
+        "frames": 4,
+        "duration": 600,
+        "loop": false,
+        "priority": 10,
+        "returnTo": "Idle_Left"
+      },
+      "Shield": {
+        "type": "sheet",
+        "file": "Shield.png",
+        "frames": 2,
+        "duration": 500,
+        "loop": false,
+        "priority": 8,
+        "returnTo": "Idle"
+      },
+      "Shield_Left": {
+        "type": "sheet",
+        "file": "Shield_Left.png",
+        "frames": 2,
+        "duration": 500,
+        "loop": false,
+        "priority": 8,
+        "returnTo": "Idle_Left"
+      },
+      "Jump": {
+        "type": "sheet",
+        "file": "Jump.png",
+        "frames": 10,
+        "duration": 900,
+        "loop": false,
+        "priority": 5,
+        "returnTo": "Idle"
+      },
+      "Jump_Left": {
+        "type": "sheet",
+        "file": "Jump_Left.png",
+        "frames": 10,
+        "duration": 900,
+        "loop": false,
+        "priority": 5,
+        "returnTo": "Idle_Left"
+      },
+      "Hurt": {
+        "type": "sheet",
+        "file": "Hurt.png",
+        "frames": 3,
+        "duration": 400,
+        "loop": false,
+        "priority": 15,
+        "returnTo": "Idle"
+      },
+      "Hurt_Left": {
+        "type": "sheet",
+        "file": "Hurt_Left.png",
+        "frames": 3,
+        "duration": 400,
+        "loop": false,
+        "priority": 15,
+        "returnTo": "Idle_Left"
+      },
+      "Dead": {
+        "type": "sheet",
+        "file": "Dead.png",
+        "frames": 3,
+        "duration": 1000,
+        "loop": false,
+        "priority": 20,
+        "returnTo": null
+      },
+      "Dead_Left": {
+        "type": "sheet",
+        "file": "Dead_Left.png",
+        "frames": 3,
+        "duration": 1000,
+        "loop": false,
+        "priority": 20,
+        "returnTo": null
+      }
+    }
+  },
+  "abilities": {
+    "doubleJump": false,
+    "wallJump": false,
+    "dash": false,
+    "block": true,
+    "counterAttack": true
+  }
+}

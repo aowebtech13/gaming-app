@@ -1,0 +1,950 @@
+<%- include('../header.ejs', { page }) %>
+
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <%- include('../modules/header.block.ejs', { page }) %>
+
+    <div system-wrapper>
+        <!-- Header Banner Ad -->
+        <div class="bg-gray-50/30 dark:bg-gray-800/30 border-b border-gray-200/50 dark:border-gray-700/50 py-4">
+            <div class="container mx-auto px-4 sm:px-6 flex justify-center">
+                <% if (enable_frontend_pjax === '0') { %>
+                    <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile header ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } else { %>
+                    <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile header ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- main content -->
+        <main class="container mx-auto px-4 sm:px-6 py-6 lg:py-8 space-y-8 lg:space-y-12">
+
+            <!-- Featured Games Grid -->
+            <% if (featuredGames && featuredGames.length > 0) { %>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <% featuredGames.forEach(game => { %>
+                    <a href="/play/<%= game.slug %>" class="group" system-nav>
+                        <div class="game-thumbnail aspect-square rounded-2xl overflow-hidden transition-all duration-200 group-hover:shadow-xl group-hover:-translate-y-1 relative" data-game-id="<%= game.id %>">
+                            <!-- Featured Badge -->
+                            <div class="absolute top-2 left-2 z-10">
+                                <span class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md border border-yellow-300/50">
+                                    <%= __('games.featured_badge') %>
+                                </span>
+                            </div>
+                            
+                            <% if (game.parsedThumbnail && game.parsedThumbnail.webp && game.parsedThumbnail.original) {
+                                let webpImage = game.parsedThumbnail.webp.thumbnail || game.parsedThumbnail.webp.standard;
+                                let originalImage = game.parsedThumbnail.original.thumbnail || game.parsedThumbnail.original.standard;
+                                
+                                if (webpImage && originalImage) { %>
+                                    <picture>
+                                        <source srcset="/<%= webpImage.relativePath %>" type="image/webp">
+                                        <img src="/<%= originalImage.relativePath %>" alt="<%= game.title %>" class="w-full h-full object-cover" loading="lazy">
+                                    </picture>
+                                <% } else { %>
+                                    <img src="https://dummyimage.com/200x200/9CA3AF/FFFFFF?text=<%= encodeURIComponent(game.title) %>" alt="<%= game.title %>" class="w-full h-full object-cover" loading="lazy">
+                                <% }
+                            } else if (game.thumbnail) { %>
+                                <img src="<%= game.thumbnail.startsWith('/') ? game.thumbnail : '/' + game.thumbnail %>" alt="<%= game.title %>" class="w-full h-full object-cover" loading="lazy">
+                            <% } else { %>
+                                <img src="https://dummyimage.com/200x200/9CA3AF/FFFFFF?text=<%= encodeURIComponent(game.title) %>" alt="<%= game.title %>" class="w-full h-full object-cover" loading="lazy">
+                            <% } %>
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex flex-col items-center justify-between p-3">
+                                <!-- Play Icon -->
+                                <div class="flex-1 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </div>
+                                <!-- Game Title at Bottom -->
+                                <div class="text-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                    <h3 class="font-bold text-sm line-clamp-2"><%= game.title %></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                <% }); %>
+            </div>
+            <% } %>
+
+            <!-- Categories Grid -->
+            <div class="grid gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <% 
+                // Helper function to lighten a hex color
+                function lightenColor(hex, percent) {
+                    const num = parseInt(hex.replace("#", ""), 16);
+                    const amt = Math.round(2.55 * percent);
+                    const R = (num >> 16) + amt;
+                    const G = (num >> 8 & 0x00FF) + amt;
+                    const B = (num & 0x0000FF) + amt;
+                    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                        (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+                }
+                
+                // Helper function for proper singular/plural
+                function pluralize(count, singular, plural) {
+                    return count === 1 ? singular : plural;
+                }
+                
+                // Fallback color schemes for categories without custom colors
+                const fallbackColors = ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444', '#6366F1'];
+                %>
+                
+
+                <% if (categories && categories.length > 0) { %>
+                    <% categories.forEach((category, index) => { %>
+                        <% 
+                        const categoryColor = category.color || fallbackColors[index % fallbackColors.length];
+                        const lightColor = lightenColor(categoryColor, 30);
+                        %>
+                        <section class="space-y-4">
+                            <div class="relative rounded-2xl overflow-hidden text-white shadow-lg min-h-[160px]">
+                                <!-- Background layer with image and gradient -->
+                                <div class="absolute inset-0">
+                                    <% if (category.image) { %>
+                                    <!-- Image background -->
+                                    <% 
+                                        let categoryImageUrl = category.image;
+                                        // Check if it's the new JSON format
+                                        try {
+                                            if (typeof category.image === 'string' && category.image.startsWith('{')) {
+                                                let parsedData = JSON.parse(category.image);
+                                                if (parsedData.webp && parsedData.webp.large) {
+                                                    categoryImageUrl = `/${parsedData.webp.large.relativePath}`;
+                                                } else if (parsedData.original && parsedData.original.large) {
+                                                    categoryImageUrl = `/${parsedData.original.large.relativePath}`;
+                                                }
+                                            } else {
+                                                categoryImageUrl = category.image.startsWith('/') ? category.image : '/' + category.image;
+                                            }
+                                        } catch(e) {
+                                            categoryImageUrl = category.image.startsWith('/') ? category.image : '/' + category.image;
+                                        }
+                                    %>
+                                    <div class="absolute inset-0 bg-center bg-cover" style="background-image: url('<%= categoryImageUrl %>')"></div>
+                                    <!-- Gradient overlay that blends with the image -->
+                                    <div class="absolute inset-0" style="background: linear-gradient(135deg, <%= categoryColor %>CC 0%, <%= lightenColor(categoryColor, -20) %>E6 50%, <%= categoryColor %>99 100%)"></div>
+                                    <% } else { %>
+                                    <!-- Pure gradient background when no image -->
+                                    <div class="absolute inset-0" style="background: linear-gradient(135deg, <%= categoryColor %> 0%, <%= lightenColor(categoryColor, -20) %> 100%)"></div>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- Content layer -->
+                                <div class="relative z-10 p-6 flex items-center min-h-[160px]">
+                                    <div class="flex-1">
+                                        <h2 class="text-2xl lg:text-3xl font-bold text-white drop-shadow-lg"><%= category.name %></h2>
+                                        <% const gameCount = category.totalGames; %>
+                                        <p class="mt-2 mb-4 text-white/90 text-sm lg:text-base drop-shadow"><%= gameCount %> <%= gameCount === 1 ? __('common.game') : __('common.games') %> <%= __('common.available_to_play') %></p>
+                                        <a href="/games/category/<%= category.slug %>"
+                                            class="inline-flex items-center gap-2 border-2 border-white/80 rounded-full px-4 py-2 text-sm font-medium text-white hover:bg-white hover:border-white transition-all duration-200 group backdrop-blur-sm" 
+                                            style="--category-color: <%= categoryColor %>;" 
+                                            onmouseover="this.style.color='var(--category-color)'"
+                                            onmouseout="this.style.color='white'"
+                                            system-nav>
+                                            <span><%= __('games.explore_games') %></span>
+                                            <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Icon overlay (only when no image) -->
+                                    <% if (!category.image && category.icon) { %>
+                                    <div class="hidden lg:flex absolute right-6 top-1/2 transform -translate-y-1/2 opacity-20">
+                                        <img src="/assets/images/heroicons/<%= category.icon %>.svg" alt="<%= category.name %>" class="w-16 h-16 brightness-0 saturate-100 invert" />
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="relative group">
+                                <div id="<%= category.slug %>-list"
+                                    class="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory px-1 py-2 scrollbar-none">
+                                    <% if (category.games && category.games.length > 0) { %>
+                                        <% category.games.forEach(game => { %>
+                                            <a href="/play/<%= game.slug %>" class="flex-shrink-0 snap-center game-item group/game" system-nav>
+                                                <div class="game-thumbnail relative overflow-hidden rounded-xl shadow-md group-hover/game:shadow-lg transition-all duration-200" data-game-id="<%= game.id %>">
+                                                    <% if (game.parsedThumbnail && game.parsedThumbnail.webp && game.parsedThumbnail.original) {
+                                                        let webpImage = game.parsedThumbnail.webp.thumbnail || game.parsedThumbnail.webp.standard;
+                                                        let originalImage = game.parsedThumbnail.original.thumbnail || game.parsedThumbnail.original.standard;
+                                                        
+                                                        if (webpImage && originalImage) { %>
+                                                            <picture>
+                                                                <source srcset="/<%= webpImage.relativePath %>" type="image/webp">
+                                                                <img src="/<%= originalImage.relativePath %>" alt="<%= game.title %>" class="w-32 h-32 sm:w-40 sm:h-40 object-cover" loading="lazy">
+                                                            </picture>
+                                                        <% } else { %>
+                                                            <img src="https://dummyimage.com/200x200/9CA3AF/FFFFFF?text=<%= encodeURIComponent(game.title) %>" alt="<%= game.title %>" class="w-32 h-32 sm:w-40 sm:h-40 object-cover" loading="lazy">
+                                                        <% }
+                                                    } else if (game.thumbnail) { %>
+                                                        <img src="<%= game.thumbnail.startsWith('/') ? game.thumbnail : '/' + game.thumbnail %>" alt="<%= game.title %>" class="w-32 h-32 sm:w-40 sm:h-40 object-cover" loading="lazy">
+                                                    <% } else { %>
+                                                        <img src="https://dummyimage.com/200x200/9CA3AF/FFFFFF?text=<%= encodeURIComponent(game.title) %>" alt="<%= game.title %>" class="w-32 h-32 sm:w-40 sm:h-40 object-cover" loading="lazy">
+                                                    <% } %>
+                                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover/game:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-white opacity-0 group-hover/game:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M8 5v14l11-7z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2">
+                                                        <p class="text-white text-xs font-medium truncate"><%= game.title %></p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        <% }); %>
+                                    <% } %>
+                                </div>
+                                
+                                <!-- Navigation arrows (always show if more than 3 games) -->
+                                <% if (category.games && category.games.length > 3) { %>
+                                <button
+                                    class="carousel-btn-prev absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+                                    onclick="window.scrollCarousel('<%= category.slug %>-list', 'prev')"
+                                    style="background-color: <%= categoryColor %>20; border: 2px solid <%= categoryColor %>;">
+                                    <svg class="w-5 h-5" style="color: <%= categoryColor %>;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                    </svg>
+                                </button>
+                                <button
+                                    class="carousel-btn-next absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white hover:shadow-xl transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+                                    onclick="window.scrollCarousel('<%= category.slug %>-list', 'next')"
+                                    style="background-color: <%= categoryColor %>20; border: 2px solid <%= categoryColor %>;">
+                                    <svg class="w-5 h-5" style="color: <%= categoryColor %>;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                                <% } %>
+                                
+                                <!-- Scroll indicators -->
+                                <% if (category.games && category.games.length > 3) { %>
+                                <div class="flex justify-center mt-3 space-x-1">
+                                    <% for (let i = 0; i < Math.ceil(category.games.length / 3); i++) { %>
+                                        <div class="w-2 h-2 rounded-full bg-gray-300 transition-colors duration-200" 
+                                             data-indicator="<%= category.slug %>-indicator-<%= i %>"></div>
+                                    <% } %>
+                                </div>
+                                <% } %>
+                            </div>
+                        </section>
+                    <% }); %>
+                <% } else { %>
+                    <!-- Fallback content when no categories -->
+                    <div class="col-span-full text-center py-16">
+                        <div class="max-w-lg mx-auto space-y-6">
+                            <div class="relative">
+                                <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full mx-auto flex items-center justify-center shadow-lg">
+                                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </div>
+                                <div class="absolute -top-1 -right-1 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-yellow-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= __('games.loading_categories') %></h3>
+                                <p class="text-gray-600 dark:text-gray-300 text-lg"><%= __('games.loading_categories_desc') %></p>
+                            </div>
+                            <div class="flex justify-center space-x-2">
+                                <div class="w-3 h-3 bg-pink-500 rounded-full animate-bounce"></div>
+                                <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                                <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Top Searches -->
+            <% 
+            // Check if there are any games in the system
+            const hasGames = categories && categories.length > 0 && categories.some(cat => cat.games && cat.games.length > 0);
+            %>
+            <% if (hasGames) { %>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-gray-800 dark:text-gray-200 text-lg">
+                            <%= __('search.top_searches') %>
+                        </h3>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-full">
+<%= __('common.last_30_days') %>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <% if (topSearches && topSearches.length > 0) { %>
+                        <% topSearches.forEach((search, index) => { %>
+                            <% 
+                            // Create color variations for different search terms
+                            const colors = [
+                                'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-800/30',
+                                'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-800/30',
+                                'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-800/30',
+                                'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-800/30',
+                                'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 border-pink-100 dark:border-pink-800 hover:bg-pink-100 dark:hover:bg-pink-800/30',
+                                'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-800/30',
+                                'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-800/30',
+                                'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-800/30'
+                            ];
+                            const colorClass = colors[index % colors.length];
+                            %>
+                            <a href="/search/<%= encodeURIComponent(search.query) %>" 
+                               class="<%= colorClass %> px-4 py-2 rounded-full font-medium transition-all duration-200 cursor-pointer border flex items-center space-x-2 hover:shadow-sm" 
+                               system-nav>
+                                <span><%= search.query %></span>
+                                <span class="text-xs opacity-70 bg-white/50 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
+                                    <%= search.search_count %>
+                                </span>
+                            </a>
+                        <% }); %>
+                    <% } else { %>
+                        <!-- Fallback tags when no top searches are available -->
+                        <span class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-blue-100 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-800/30">action</span>
+                        <span class="bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-purple-100 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-800/30">adventure</span>
+                        <span class="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-green-100 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-800/30">puzzle</span>
+                        <span class="bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-orange-100 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-800/30">racing</span>
+                        <span class="bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-pink-100 dark:border-pink-800 hover:bg-pink-100 dark:hover:bg-pink-800/30">strategy</span>
+                        <span class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-800/30">arcade</span>
+                    <% } %>
+                </div>
+                <% if (topSearches && topSearches.length > 0) { %>
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-600">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+<%= __('search.community_activity') %>
+                    </p>
+                </div>
+                <% } %>
+            </div>
+            <% } %>
+
+
+            <!-- Popular Tags -->
+            <% if (hasGames) { %>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <svg class="w-6 h-6 text-purple-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-gray-800 dark:text-gray-200 text-lg"><%= __('games.popular_tags') %></h3>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-1 rounded-full">
+<%= __('games.from_top_games') %>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 text-sm">
+                    <% if (popularTags && popularTags.length > 0) { %>
+                        <% popularTags.forEach((tagData, index) => { %>
+                            <% 
+                            // Create color variations for different tags
+                            const tagColors = [
+                                'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-800/30',
+                                'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-800/30',
+                                'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-800/30',
+                                'bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-800/30',
+                                'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 border-pink-100 dark:border-pink-800 hover:bg-pink-100 dark:hover:bg-pink-800/30',
+                                'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-800/30',
+                                'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-800/30',
+                                'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800 hover:bg-yellow-100 dark:hover:bg-yellow-800/30',
+                                'bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border-teal-100 dark:border-teal-800 hover:bg-teal-100 dark:hover:bg-teal-800/30',
+                                'bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 border-cyan-100 dark:border-cyan-800 hover:bg-cyan-100 dark:hover:bg-cyan-800/30',
+                                'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-800/30',
+                                'bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 border-violet-100 dark:border-violet-800 hover:bg-violet-100 dark:hover:bg-violet-800/30'
+                            ];
+                            const colorClass = tagColors[index % tagColors.length];
+                            
+                            // Helper function to capitalize first letter
+                            const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+                            %>
+                            <a href="/games/tag/<%= encodeURIComponent(tagData.tag) %>" 
+                               class="<%= colorClass %> px-4 py-2 rounded-full font-medium transition-all duration-200 cursor-pointer border flex items-center space-x-2 hover:shadow-sm" 
+                               system-nav>
+                                <span><%= capitalize(tagData.tag) %></span>
+                                <span class="text-xs opacity-70 bg-white/50 dark:bg-black/30 px-1.5 py-0.5 rounded-full">
+                                    <%= tagData.count %>
+                                </span>
+                            </a>
+                        <% }); %>
+                    <% } else { %>
+                        <!-- Fallback tags when no popular tags are available -->
+                        <a href="/games/tag/action" class="bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-purple-100 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-800/30" system-nav>Action</a>
+                        <a href="/games/tag/adventure" class="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-blue-100 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-800/30" system-nav>Adventure</a>
+                        <a href="/games/tag/puzzle" class="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-green-100 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-800/30" system-nav>Puzzle</a>
+                        <a href="/games/tag/racing" class="bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-orange-100 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-800/30" system-nav>Racing</a>
+                        <a href="/games/tag/strategy" class="bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-pink-100 dark:border-pink-800 hover:bg-pink-100 dark:hover:bg-pink-800/30" system-nav>Strategy</a>
+                        <a href="/games/tag/arcade" class="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-full font-medium transition-colors duration-200 cursor-pointer border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-800/30" system-nav>Arcade</a>
+                    <% } %>
+                </div>
+                <% if (popularTags && popularTags.length > 0) { %>
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-600">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+<%= __('games.tags_from_popular') %>
+                    </p>
+                </div>
+                <% } %>
+            </div>
+            <% } %>
+
+            <!-- Masonry Game Catalog -->
+            <div class="space-y-8">
+                <div class="text-center space-y-4">
+                    <div class="flex items-center justify-center">
+                        <svg class="w-10 h-10 text-pink-500 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <h2 class="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"><%= __('games.discover_games') %></h2>
+                    </div>
+                    <p class="text-xl text-gray-600 dark:text-gray-300"><%= __('games.handpicked_desc') %></p>
+                </div>
+                
+                <div class="masonry-grid">
+                    <% if (discoveryGames && discoveryGames.length > 0) { %>
+                        <% discoveryGames.forEach((game, index) => { %>
+                            <div class="masonry-item">
+                                <a href="/play/<%= game.slug %>" class="group" system-nav>
+                                    <div class="relative overflow-hidden">
+                                        <% if (game.parsedThumbnail && game.parsedThumbnail.webp && game.parsedThumbnail.original) {
+                                            let webpImage = game.parsedThumbnail.webp.large || game.parsedThumbnail.webp.standard || game.parsedThumbnail.webp.thumbnail;
+                                            let originalImage = game.parsedThumbnail.original.large || game.parsedThumbnail.original.standard || game.parsedThumbnail.original.thumbnail;
+                                            
+                                            if (webpImage && originalImage) { %>
+                                                <picture>
+                                                    <source srcset="/<%= webpImage.relativePath %>" type="image/webp">
+                                                    <img src="/<%= originalImage.relativePath %>" alt="<%= game.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                                </picture>
+                                            <% } else { %>
+                                                <img src="https://dummyimage.com/300x400/9CA3AF/FFFFFF?text=<%= encodeURIComponent(game.title) %>" alt="<%= game.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                            <% }
+                                        } else if (game.thumbnail) { %>
+                                            <img src="<%= game.thumbnail.startsWith('/') ? game.thumbnail : '/' + game.thumbnail %>" alt="<%= game.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                        <% } else { %>
+                                            <img src="https://dummyimage.com/300x400/9CA3AF/FFFFFF?text=<%= encodeURIComponent(game.title) %>" alt="<%= game.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                                        <% } %>
+                                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/60 transition-all duration-300"></div>
+                                        
+                                        <!-- Game info overlay -->
+                                        <div class="absolute inset-0 p-3 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <div class="space-y-2">
+                                                <h3 class="font-bold text-white text-sm leading-tight drop-shadow-lg line-clamp-2"><%= game.title %></h3>
+                                                
+                                                <!-- Game Tags -->
+                                                <% if (game.tags) { %>
+                                                <div class="flex flex-wrap gap-1">
+                                                    <% game.tags.split(',').slice(0, 3).forEach(tag => { %>
+                                                        <% if (tag.trim()) { %>
+                                                        <span class="bg-white/20 backdrop-blur-sm text-white px-2 py-0.5 rounded-full text-xs font-medium">
+                                                            #<%= tag.trim() %>
+                                                        </span>
+                                                        <% } %>
+                                                    <% }); %>
+                                                </div>
+                                                <% } %>
+                                                
+                                                <div class="flex items-center justify-between">
+                                                    <span class="bg-white/30 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
+                                                        <%= game.category_name || 'Game' %>
+                                                    </span>
+                                                    <% if (enable_ratings === '1' && game.average_rating) { %>
+                                                    <div class="flex text-yellow-300 text-xs">
+                                                        <% for(let i = 1; i <= 5; i++) { %>
+                                                            <svg class="w-4 h-4 <%= (game.average_rating >= i) ? '' : 'text-white/40' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                                            </svg>
+                                                        <% } %>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Play button in center -->
+                                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            <div class="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300">
+                                                <svg class="w-5 h-5 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M8 5v14l11-7z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <!-- Fallback content when no discovery games -->
+                        <div class="col-span-full text-center py-12">
+                            <div class="max-w-md mx-auto space-y-4">
+                                <svg class="w-16 h-16 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100"><%= __('games.coming_soon') %></h3>
+                                <p class="text-gray-600 dark:text-gray-300"><%= __('games.coming_soon_desc') %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <% if (discoveryGames && discoveryGames.length > 0) { %>
+                <div class="text-center mt-12">
+                    <a href="/games" class="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl" system-nav>
+                        <span><%= __('games.explore_all_games') %></span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+                <% } %>
+            </div>
+
+            <!-- Hall of Fame -->
+            <% if (hasGames && hallOfFameUsers && hallOfFameUsers.length > 0) { %>
+            <div class="p-6 lg:p-8 overflow-hidden relative">
+                <!-- Background decorative elements -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-yellow-200/20 to-transparent rounded-full transform translate-x-16 -translate-y-16"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-200/20 to-transparent rounded-full transform -translate-x-12 translate-y-12"></div>
+                
+                <!-- Header -->
+                <div class="relative z-10 text-center mb-8">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center shadow-lg mr-3 animate-pulse">
+                            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent">
+                                <%= __('hall_of_fame.title') %>
+                            </h2>
+                            <p class="text-amber-600 font-medium">
+                                <%= __('hall_of_fame.subtitle') %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Responsive 5-Player Layout -->
+                <div class="relative z-10 max-w-6xl mx-auto">
+                    <!-- Desktop Layout: Single Row with All 5 Players -->
+                    <div class="hidden lg:flex items-end justify-center space-x-4">
+                        <% if (hallOfFameUsers.length >= 4) { %>
+                        <!-- 4th Place (Far Left) -->
+                        <div class="flex flex-col items-center animate-float-delay-6">
+                            <div class="w-32 bg-gradient-to-br from-purple-100 to-purple-200 p-4 rounded-2xl shadow-lg border-2 border-purple-400 mb-4 hover:scale-105 transition-all duration-300 cursor-pointer group">
+                                <div class="text-center space-y-2">
+                                    <div class="relative">
+                                        <img src="<%= hallOfFameUsers[3].avatarUrl %>" alt="<%= hallOfFameUsers[3].username %>" class="w-14 h-14 rounded-full border-4 border-purple-400 shadow-lg mx-auto object-cover">
+                                        <div class="absolute -top-1 -right-1 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">4</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-purple-800 text-sm truncate"><%= hallOfFameUsers[3].displayName %></h4>
+                                        <p class="text-purple-600 text-xs font-medium"><%= __('hall_of_fame.fourth_place') %></p>
+                                    </div>
+                                    <div class="bg-purple-50 px-2 py-1 rounded-full text-xs font-semibold text-purple-700">
+                                        <%= __('hall_of_fame.level', { level: hallOfFameUsers[3].level }) %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-16 h-10 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-lg shadow-lg flex items-center justify-center border-t-4 border-purple-300">
+                                <span class="text-lg font-bold text-white drop-shadow-lg">4</span>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <% if (hallOfFameUsers.length >= 2) { %>
+                        <!-- 2nd Place (Left) -->
+                        <div class="flex flex-col items-center animate-float-delay-2">
+                            <div class="w-36 bg-gradient-to-br from-gray-100 to-gray-200 p-5 rounded-2xl shadow-lg border-2 border-gray-300 mb-4 hover:scale-105 transition-all duration-300 cursor-pointer group">
+                                <div class="text-center space-y-3">
+                                    <div class="relative">
+                                        <img src="<%= hallOfFameUsers[1].avatarUrl %>" alt="<%= hallOfFameUsers[1].username %>" class="w-16 h-16 rounded-full border-4 border-gray-300 shadow-lg mx-auto object-cover">
+                                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">2</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-800 text-base truncate"><%= hallOfFameUsers[1].displayName %></h4>
+                                        <p class="text-gray-600 text-sm font-medium"><%= __('hall_of_fame.runner_up') %></p>
+                                    </div>
+                                    <div class="bg-gray-50 px-3 py-1 rounded-full text-xs font-semibold text-gray-700">
+                                        <%= __('hall_of_fame.level', { level: hallOfFameUsers[1].level }) %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-20 h-16 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg shadow-lg flex items-center justify-center border-t-4 border-gray-200">
+                                <span class="text-2xl font-bold text-white drop-shadow-lg">2</span>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <% if (hallOfFameUsers.length >= 1) { %>
+                        <!-- 1st Place (Center, Tallest) -->
+                        <div class="flex flex-col items-center animate-float">
+                            <div class="w-40 bg-gradient-to-br from-yellow-100 to-amber-100 p-6 rounded-2xl shadow-xl border-4 border-yellow-400 mb-4 relative hover:scale-105 transition-all duration-300 cursor-pointer group">
+                                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-12 h-12 text-yellow-500 drop-shadow-lg animate-bounce" style="animation-duration: 3s;">
+                                        <path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                    </svg>
+                                </div>
+                                <div class="text-center space-y-3 pt-4">
+                                    <div class="relative">
+                                        <img src="<%= hallOfFameUsers[0].avatarUrl %>" alt="<%= hallOfFameUsers[0].username %>" class="w-20 h-20 rounded-full border-4 border-yellow-400 shadow-xl mx-auto object-cover">
+                                        <div class="absolute -top-2 -right-2 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg animate-pulse">1</div>
+                                        <div class="absolute inset-0 rounded-full bg-yellow-400/20 animate-ping"></div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-amber-800 text-lg truncate"><%= hallOfFameUsers[0].displayName %></h4>
+                                        <p class="text-yellow-600 text-sm font-bold"><%= __('hall_of_fame.champion') %></p>
+                                    </div>
+                                    <div class="bg-yellow-200 px-3 py-1 rounded-full text-sm font-bold text-amber-800">
+                                        <%= __('hall_of_fame.level', { level: hallOfFameUsers[0].level }) %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-24 h-20 bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-t-lg shadow-xl flex items-center justify-center border-t-4 border-yellow-300 relative">
+                                <span class="text-3xl font-bold text-white drop-shadow-lg">1</span>
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer rounded-t-lg"></div>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <% if (hallOfFameUsers.length >= 3) { %>
+                        <!-- 3rd Place (Right) -->
+                        <div class="flex flex-col items-center animate-float-delay-4">
+                            <div class="w-36 bg-gradient-to-br from-orange-100 to-amber-100 p-5 rounded-2xl shadow-lg border-2 border-orange-400 mb-4 hover:scale-105 transition-all duration-300 cursor-pointer group">
+                                <div class="text-center space-y-3">
+                                    <div class="relative">
+                                        <img src="<%= hallOfFameUsers[2].avatarUrl %>" alt="<%= hallOfFameUsers[2].username %>" class="w-16 h-16 rounded-full border-4 border-orange-400 shadow-lg mx-auto object-cover">
+                                        <div class="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">3</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-orange-800 text-base truncate"><%= hallOfFameUsers[2].displayName %></h4>
+                                        <p class="text-orange-600 text-sm font-medium"><%= __('hall_of_fame.third_place') %></p>
+                                    </div>
+                                    <div class="bg-orange-50 px-3 py-1 rounded-full text-xs font-semibold text-orange-700">
+                                        <%= __('hall_of_fame.level', { level: hallOfFameUsers[2].level }) %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-16 h-12 bg-gradient-to-t from-orange-600 to-orange-400 rounded-t-lg shadow-lg flex items-center justify-center border-t-4 border-orange-300">
+                                <span class="text-xl font-bold text-white drop-shadow-lg">3</span>
+                            </div>
+                        </div>
+                        <% } %>
+
+                        <% if (hallOfFameUsers.length >= 5) { %>
+                        <!-- 5th Place (Far Right) -->
+                        <div class="flex flex-col items-center animate-float-delay-8">
+                            <div class="w-32 bg-gradient-to-br from-blue-100 to-blue-200 p-4 rounded-2xl shadow-lg border-2 border-blue-400 mb-4 hover:scale-105 transition-all duration-300 cursor-pointer group">
+                                <div class="text-center space-y-2">
+                                    <div class="relative">
+                                        <img src="<%= hallOfFameUsers[4].avatarUrl %>" alt="<%= hallOfFameUsers[4].username %>" class="w-14 h-14 rounded-full border-4 border-blue-400 shadow-lg mx-auto object-cover">
+                                        <div class="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">5</div>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-blue-800 text-sm truncate"><%= hallOfFameUsers[4].displayName %></h4>
+                                        <p class="text-blue-600 text-xs font-medium"><%= __('hall_of_fame.fifth_place') %></p>
+                                    </div>
+                                    <div class="bg-blue-50 px-2 py-1 rounded-full text-xs font-semibold text-blue-700">
+                                        <%= __('hall_of_fame.level', { level: hallOfFameUsers[4].level }) %>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-16 h-10 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg shadow-lg flex items-center justify-center border-t-4 border-blue-300">
+                                <span class="text-lg font-bold text-white drop-shadow-lg">5</span>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <!-- Tablet Layout: Top 3 in Podium, 4th & 5th Below -->
+                    <div class="hidden md:block lg:hidden">
+                        <!-- Top 3 Podium -->
+                        <div class="flex items-end justify-center space-x-4 mb-8">
+                            <% if (hallOfFameUsers.length >= 2) { %>
+                            <div class="flex flex-col items-center animate-float-delay-2">
+                                <div class="w-32 bg-gradient-to-br from-gray-100 to-gray-200 p-4 rounded-2xl shadow-lg border-2 border-gray-300 mb-4 hover:scale-105 transition-all duration-300">
+                                    <div class="text-center space-y-2">
+                                        <div class="relative">
+                                            <img src="<%= hallOfFameUsers[1].avatarUrl %>" alt="<%= hallOfFameUsers[1].username %>" class="w-16 h-16 rounded-full border-4 border-gray-300 shadow-lg mx-auto object-cover">
+                                            <div class="absolute -top-1 -right-1 w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">2</div>
+                                        </div>
+                                        <h4 class="font-bold text-gray-800 text-sm truncate"><%= hallOfFameUsers[1].displayName %></h4>
+                                        <p class="text-gray-600 text-xs"><%= __('hall_of_fame.runner_up') %></p>
+                                    </div>
+                                </div>
+                                <div class="w-16 h-12 bg-gradient-to-t from-gray-400 to-gray-300 rounded-t-lg shadow-lg flex items-center justify-center">
+                                    <span class="text-lg font-bold text-white">2</span>
+                                </div>
+                            </div>
+                            <% } %>
+
+                            <% if (hallOfFameUsers.length >= 1) { %>
+                            <div class="flex flex-col items-center animate-float">
+                                <div class="w-36 bg-gradient-to-br from-yellow-100 to-amber-100 p-4 rounded-2xl shadow-xl border-4 border-yellow-400 mb-4 relative hover:scale-105 transition-all duration-300">
+                                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8 text-yellow-500 animate-bounce">
+                                            <path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-center space-y-2 pt-2">
+                                        <div class="relative">
+                                            <img src="<%= hallOfFameUsers[0].avatarUrl %>" alt="<%= hallOfFameUsers[0].username %>" class="w-16 h-16 rounded-full border-4 border-yellow-400 shadow-xl mx-auto object-cover">
+                                            <div class="absolute -top-1 -right-1 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">1</div>
+                                        </div>
+                                        <h4 class="font-bold text-amber-800 text-base truncate"><%= hallOfFameUsers[0].displayName %></h4>
+                                        <p class="text-yellow-600 text-sm font-bold"><%= __('hall_of_fame.champion') %></p>
+                                    </div>
+                                </div>
+                                <div class="w-20 h-16 bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-t-lg shadow-xl flex items-center justify-center relative">
+                                    <span class="text-2xl font-bold text-white">1</span>
+                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer rounded-t-lg"></div>
+                                </div>
+                            </div>
+                            <% } %>
+
+                            <% if (hallOfFameUsers.length >= 3) { %>
+                            <div class="flex flex-col items-center animate-float-delay-4">
+                                <div class="w-32 bg-gradient-to-br from-orange-100 to-amber-100 p-4 rounded-2xl shadow-lg border-2 border-orange-400 mb-4 hover:scale-105 transition-all duration-300">
+                                    <div class="text-center space-y-2">
+                                        <div class="relative">
+                                            <img src="<%= hallOfFameUsers[2].avatarUrl %>" alt="<%= hallOfFameUsers[2].username %>" class="w-16 h-16 rounded-full border-4 border-orange-400 shadow-lg mx-auto object-cover">
+                                            <div class="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg">3</div>
+                                        </div>
+                                        <h4 class="font-bold text-orange-800 text-sm truncate"><%= hallOfFameUsers[2].displayName %></h4>
+                                        <p class="text-orange-600 text-xs"><%= __('hall_of_fame.third_place') %></p>
+                                    </div>
+                                </div>
+                                <div class="w-16 h-10 bg-gradient-to-t from-orange-600 to-orange-400 rounded-t-lg shadow-lg flex items-center justify-center">
+                                    <span class="text-lg font-bold text-white">3</span>
+                                </div>
+                            </div>
+                            <% } %>
+                        </div>
+
+                        <!-- 4th & 5th Place Row -->
+                        <% if (hallOfFameUsers.length >= 4) { %>
+                        <div class="flex justify-center space-x-6">
+                            <div class="flex flex-col items-center animate-float-delay-6">
+                                <div class="w-28 bg-gradient-to-br from-purple-100 to-purple-200 p-3 rounded-xl shadow-lg border-2 border-purple-400 hover:scale-105 transition-all duration-300">
+                                    <div class="text-center space-y-2">
+                                        <div class="relative">
+                                            <img src="<%= hallOfFameUsers[3].avatarUrl %>" alt="<%= hallOfFameUsers[3].username %>" class="w-12 h-12 rounded-full border-3 border-purple-400 shadow-lg mx-auto object-cover">
+                                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">4</div>
+                                        </div>
+                                        <h4 class="font-bold text-purple-800 text-xs truncate"><%= hallOfFameUsers[3].displayName %></h4>
+                                        <p class="text-purple-600 text-xs"><%= __('hall_of_fame.fourth_place') %></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <% if (hallOfFameUsers.length >= 5) { %>
+                            <div class="flex flex-col items-center animate-float-delay-8">
+                                <div class="w-28 bg-gradient-to-br from-blue-100 to-blue-200 p-3 rounded-xl shadow-lg border-2 border-blue-400 hover:scale-105 transition-all duration-300">
+                                    <div class="text-center space-y-2">
+                                        <div class="relative">
+                                            <img src="<%= hallOfFameUsers[4].avatarUrl %>" alt="<%= hallOfFameUsers[4].username %>" class="w-12 h-12 rounded-full border-3 border-blue-400 shadow-lg mx-auto object-cover">
+                                            <div class="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">5</div>
+                                        </div>
+                                        <h4 class="font-bold text-blue-800 text-xs truncate"><%= hallOfFameUsers[4].displayName %></h4>
+                                        <p class="text-blue-600 text-xs"><%= __('hall_of_fame.fifth_place') %></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <% } %>
+                        </div>
+                        <% } %>
+                    </div>
+
+                    <!-- Mobile Layout: Vertical Stack -->
+                    <div class="md:hidden space-y-4">
+                        <% for (let i = 0; i < Math.min(5, hallOfFameUsers.length); i++) { %>
+                        <% const user = hallOfFameUsers[i]; %>
+                        <% const rank = i + 1; %>
+                        <% const colors = {
+                            1: { bg: 'from-yellow-100 to-amber-100', border: 'border-yellow-400', text: 'text-amber-800', badge: 'bg-yellow-500', accent: 'bg-yellow-200', textAccent: 'text-yellow-600' },
+                            2: { bg: 'from-gray-100 to-gray-200', border: 'border-gray-300', text: 'text-gray-800', badge: 'bg-gray-400', accent: 'bg-gray-50', textAccent: 'text-gray-600' },
+                            3: { bg: 'from-orange-100 to-amber-100', border: 'border-orange-400', text: 'text-orange-800', badge: 'bg-orange-500', accent: 'bg-orange-50', textAccent: 'text-orange-600' },
+                            4: { bg: 'from-purple-100 to-purple-200', border: 'border-purple-400', text: 'text-purple-800', badge: 'bg-purple-500', accent: 'bg-purple-50', textAccent: 'text-purple-600' },
+                            5: { bg: 'from-blue-100 to-blue-200', border: 'border-blue-400', text: 'text-blue-800', badge: 'bg-blue-500', accent: 'bg-blue-50', textAccent: 'text-blue-600' }
+                        }; %>
+                        <% const color = colors[rank]; %>
+                        <% const positions = ['champion', 'runner_up', 'third_place', 'fourth_place', 'fifth_place']; %>
+                        
+                        <div class="bg-gradient-to-r <%= color.bg %> p-4 rounded-xl shadow-lg border-2 <%= color.border %> hover:scale-105 transition-all duration-300 animate-float<%= rank > 1 ? '-delay-' + (rank - 1) * 2 : '' %>">
+                            <div class="flex items-center space-x-4">
+                                <div class="relative">
+                                    <img src="<%= user.avatarUrl %>" alt="<%= user.username %>" class="w-16 h-16 rounded-full border-4 <%= color.border %> shadow-lg object-cover">
+                                    <div class="absolute -top-2 -right-2 w-8 h-8 <%= color.badge %> rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                        <%= rank %>
+                                    </div>
+                                    <% if (rank === 1) { %>
+                                    <div class="absolute -top-4 -left-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="w-8 h-8 text-yellow-500 animate-bounce">
+                                            <path d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                        </svg>
+                                    </div>
+                                    <% } %>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold <%= color.text %> text-lg truncate"><%= user.displayName %></h4>
+                                    <p class="<%= color.textAccent %> text-sm font-medium"><%= __('hall_of_fame.' + positions[rank - 1]) %></p>
+                                    <div class="<%= color.accent %> px-3 py-1 rounded-full text-xs font-semibold <%= color.text %> mt-1 inline-block">
+                                        <%= __('hall_of_fame.level', { level: user.level }) %>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold <%= color.text %>">#<%= rank %></div>
+                                    <div class="<%= color.textAccent %> text-xs">
+                                        <%= __('hall_of_fame.exp_points', { points: (user.exp_points || 0).toLocaleString() }) %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <!-- Call to action for users to compete -->
+                <div class="text-center mt-12">
+                    <a href="/leaderboard" class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white px-8 py-4 rounded-2xl font-semibold hover:from-amber-600 hover:to-yellow-600 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl" system-nav>
+                        <span><%= __('hall_of_fame.view_leaderboard') %></span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <% } else if (hasGames) { %>
+            <!-- Empty State for Hall of Fame -->
+            <div class="p-8 text-center">
+                <div class="space-y-6">
+                    <div class="flex justify-center">
+                        <div class="w-20 h-20 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full flex items-center justify-center shadow-lg">
+                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-amber-700 to-yellow-600 bg-clip-text text-transparent mb-2">
+                            <%= __('hall_of_fame.title') %>
+                        </h3>
+                        <p class="text-xl text-amber-700 font-medium mb-4">
+                            <%= __('hall_of_fame.no_players') %>
+                        </p>
+                        <p class="text-amber-600 text-lg">
+                            <%= __('hall_of_fame.become_legend') %>
+                        </p>
+                    </div>
+                    <!-- Responsive Empty State Placeholders -->
+                    <div class="flex justify-center items-end space-x-2 lg:space-x-4">
+                        <!-- 4th Place Placeholder -->
+                        <div class="hidden lg:flex flex-col items-center opacity-30">
+                            <div class="w-12 h-12 bg-purple-200 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-lg text-purple-400">?</span>
+                            </div>
+                            <div class="w-12 h-8 bg-purple-300 rounded-t-lg flex items-center justify-center">
+                                <span class="text-sm font-bold text-purple-500">4</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 2nd Place Placeholder -->
+                        <div class="flex flex-col items-center opacity-30">
+                            <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-2xl text-gray-400">?</span>
+                            </div>
+                            <div class="w-16 h-12 bg-gray-300 rounded-t-lg flex items-center justify-center">
+                                <span class="text-lg font-bold text-gray-500">2</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 1st Place Placeholder (Tallest) -->
+                        <div class="flex flex-col items-center opacity-30">
+                            <div class="w-20 h-20 bg-yellow-200 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-3xl text-yellow-400">?</span>
+                            </div>
+                            <div class="w-20 h-16 bg-yellow-300 rounded-t-lg flex items-center justify-center">
+                                <span class="text-xl font-bold text-yellow-500">1</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 3rd Place Placeholder -->
+                        <div class="flex flex-col items-center opacity-30">
+                            <div class="w-16 h-16 bg-orange-200 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-2xl text-orange-400">?</span>
+                            </div>
+                            <div class="w-16 h-10 bg-orange-300 rounded-t-lg flex items-center justify-center">
+                                <span class="text-lg font-bold text-orange-500">3</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 5th Place Placeholder -->
+                        <div class="hidden lg:flex flex-col items-center opacity-30">
+                            <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mb-2">
+                                <span class="text-lg text-blue-400">?</span>
+                            </div>
+                            <div class="w-12 h-8 bg-blue-300 rounded-t-lg flex items-center justify-center">
+                                <span class="text-sm font-bold text-blue-500">5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- About Section -->
+            <div class="bg-gradient-to-br from-gray-50 dark:from-gray-800 to-blue-50 dark:to-blue-900/30 rounded-3xl p-8 lg:p-12">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="text-center space-y-4">
+                        <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100">
+                            <%= __('homepage.ultimate_title') %>
+                            <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                                <%= __('homepage.gaming_experience') %>
+                            </span>
+                        </h2>
+                        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                            <%= __('homepage.join_players_desc') %>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer Banner Ad -->
+        <div class="bg-gray-50/30 dark:bg-gray-800/30 border-t border-gray-200/50 dark:border-gray-700/50 py-6">
+            <div class="container mx-auto px-4 sm:px-6 flex justify-center">
+                <% if (enable_frontend_pjax === '0') { %>
+                    <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'footer-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile footer ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } else { %>
+                    <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'footer-banner', width: 728, height: 90, classes: '!hidden lg:!block' }) %>
+                    <!-- Mobile footer ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden' }) %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../modules/footer.block.ejs', { page }) %>
+
+<%- include('../footer.ejs', { page }) %>

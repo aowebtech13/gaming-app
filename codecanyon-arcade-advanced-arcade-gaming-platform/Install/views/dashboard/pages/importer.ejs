@@ -1,0 +1,198 @@
+<%- include('../header.ejs', { page }) %>
+
+<div class="flex min-h-screen bg-gray-50/50">
+    <!-- Sidebar -->
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <!-- Main area -->
+    <div class="flex-1 flex flex-col min-w-0" system-wrapper>
+        <!-- Header (topbar) -->
+        <%- include('../modules/header.block.ejs', { page }) %>
+        
+        <!-- Main content -->
+        <div class="flex-1">
+            <!-- Page Header -->
+            <div class="border-b border-gray-200/50 bg-white/80 py-4 sm:py-6 lg:py-8 backdrop-blur-sm shadow-sm">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 shadow-xl">
+                                <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900 sm:text-2xl lg:text-3xl"><%= __('dashboard.importer.title') %></h1>
+                                <p class="text-xs sm:text-sm text-gray-500"><%= __('dashboard.importer.description') %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3">
+                            <!-- API Status Indicator -->
+                            <div id="apiStatus" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-100 border">
+                                <div class="w-2 h-2 rounded-full bg-gray-400" id="statusDot"></div>
+                                <span class="text-xs font-medium text-gray-600" id="statusText"><%= __('dashboard.importer.checking_api') %></span>
+                            </div>
+                            
+                            <!-- Refresh Button -->
+                            <button id="refreshGames" class="group inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-teal-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1" title="<%= __('dashboard.importer.refresh_games') %>">
+                                <svg class="w-5 h-5 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                <span class="hidden sm:inline"><%= __('dashboard.importer.refresh') %></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="mx-auto max-w-7xl px-4 py-4 sm:py-6 lg:py-8 sm:px-6 lg:px-8">
+                <!-- Filters and Search Card -->
+                <div class="mb-6 rounded-xl bg-white shadow-sm hover:shadow-lg transition-all duration-200 border border-gray-100">
+                    <div class="border-b border-gray-200/50 px-4 sm:px-6 py-4">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+                            </svg>
+<%= __('dashboard.importer.search_filters') %>
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-500"><%= __('dashboard.importer.filter_description') %></p>
+                    </div>
+                    <div class="p-4 sm:p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Search Input -->
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><%= __('dashboard.importer.search_games') %></label>
+                                <div class="relative">
+                                    <input type="text" id="searchInput" placeholder="<%= __('dashboard.importer.search_placeholder') %>" 
+                                           class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200">
+                                    <svg class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Category Filter -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2"><%= __('dashboard.importer.category') %></label>
+                                <select id="categoryFilter" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-200">
+                                    <option value=""><%= __('dashboard.importer.all_categories') %></option>
+                                    <option value="Platform"><%= __('dashboard.importer.platform') %></option>
+                                    <option value="RPG"><%= __('dashboard.importer.rpg') %></option>
+                                    <option value="Action"><%= __('dashboard.importer.action') %></option>
+                                    <option value="Adventure"><%= __('dashboard.importer.adventure') %></option>
+                                    <option value="Sports"><%= __('dashboard.importer.sports') %></option>
+                                    <option value="Puzzle"><%= __('dashboard.importer.puzzle') %></option>
+                                    <option value="Racing"><%= __('dashboard.importer.racing') %></option>
+                                    <option value="Shooter"><%= __('dashboard.importer.shooter') %></option>
+                                </select>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Filter Actions -->
+                        <div class="mt-4 flex flex-wrap items-center gap-3">
+                            <button id="applyFilters" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+<%= __('dashboard.importer.apply_filters') %>
+                            </button>
+                            <button id="clearFilters" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+<%= __('dashboard.importer.clear') %>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Info -->
+                <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600"><%= __('dashboard.importer.total') %>:</span>
+                        <span id="resultsCount" class="font-semibold text-gray-900">0</span>
+                        <span class="text-sm text-gray-600"><%= __('dashboard.importer.games_available') %></span>
+                    </div>
+                    
+                    <!-- Items per page -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600"><%= __('dashboard.importer.show') %>:</label>
+                        <select id="itemsPerPage" class="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent">
+                            <option value="16" selected>16</option>
+                            <option value="32">32</option>
+                            <option value="64">64</option>
+                        </select>
+                        <span class="text-sm text-gray-600"><%= __('dashboard.importer.per_page') %></span>
+                    </div>
+                </div>
+
+                <!-- Games Grid -->
+                <div id="gamesContainer" class="mb-8">
+                    <!-- Loading State -->
+                    <div id="loadingState" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Skeleton loaders -->
+                        <% for(let i = 0; i < 8; i++) { %>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
+                            <div class="h-48 bg-gray-300"></div>
+                            <div class="p-4">
+                                <div class="h-4 bg-gray-300 rounded mb-2"></div>
+                                <div class="h-3 bg-gray-300 rounded w-3/4 mb-2"></div>
+                                <div class="h-3 bg-gray-300 rounded w-1/2 mb-4"></div>
+                                <div class="h-8 bg-gray-300 rounded"></div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <!-- Games Grid -->
+                    <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" style="display: none;">
+                        <!-- Games will be populated by JavaScript -->
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="emptyState" class="text-center py-12" style="display: none;">
+                        <svg class="w-16 h-16 text-gray-300 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2"><%= __('dashboard.importer.no_games_found') %></h3>
+                        <p class="text-gray-500"><%= __('dashboard.importer.adjust_criteria') %></p>
+                    </div>
+                    
+                    <!-- Error State -->
+                    <div id="errorState" class="text-center py-12" style="display: none;">
+                        <svg class="w-16 h-16 text-red-300 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2"><%= __('dashboard.importer.connection_error') %></h3>
+                        <p class="text-gray-500 mb-4" id="errorMessage"><%= __('dashboard.importer.api_connection_failed') %></p>
+                        <button id="retryConnection" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+<%= __('dashboard.importer.try_again') %>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="paginationContainer" class="flex flex-col sm:flex-row items-center justify-between gap-4" style="display: none;">
+                    <div class="text-sm text-gray-600">
+                        <%= __('pagination.page') %> <span id="currentPageInfo">1</span> <%= __('dashboard.importer.of') %> <span id="totalPagesInfo">1</span>
+                    </div>
+                    
+                    <nav class="flex items-center gap-2" id="paginationNav">
+                        <!-- Pagination buttons will be generated by JavaScript -->
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <%- include('../modules/footer.block.ejs', { page }) %>
+    </div>
+</div>
+
+<%- include('../footer.ejs', { page }) %>

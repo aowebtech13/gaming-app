@@ -1,0 +1,187 @@
+<div class="p-6">
+    <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+            <svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 3V5h2v2H5zm8 0V5h2v2h-2z" clip-rule="evenodd"/><path d="M3 8.5a1 1 0 011-1h1a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm8 0a1 1 0 011-1h1a1 1 0 011 1v3a1 1 0 01-1 1h-1a1 1 0 01-1-1v-3z"/></svg><%= title %>
+        </h3>
+
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <form system-form class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.game_title') %></label>
+                <input type="text" name="title" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.game_title_placeholder') %>">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.slug') %> <span class="text-gray-500 text-xs"><%= __('games.slug_optional') %></span></label>
+                <input type="text" name="slug" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.slug_auto_generated') %>">
+                <p class="mt-1 text-xs text-gray-500"><%= __('games.slug_description') %></p>
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.short_description') %></label>
+            <input type="text" name="short_description" maxlength="500" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.short_description_placeholder') %>">
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.description') %></label>
+            <textarea name="description" rows="4" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.description_placeholder') %>"></textarea>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.game_image') %></label>
+            <input type="file" name="game_image" accept=".jpg,.jpeg,.png,.gif" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            <small class="text-gray-500 text-xs"><%= __('games.image_formats') %></small>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.category') %></label>
+                <select name="category_id" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                    <option value=""><%= __('games.select_category') %></option>
+                    <% if (data.categories && data.categories.length > 0) { %>
+                        <% data.categories.forEach(category => { %>
+                            <option value="<%= category.id %>"><%= category.name %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.game_type') %></label>
+                <select name="game_type" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                    <option value="html"><%= __('games.html5') %></option>
+                    <option value="flash"><%= __('games.flash') %></option>
+                    <option value="rom"><%= __('games.rom') %></option>
+                    <option value="embed"><%= __('games.embed') %></option>
+                </select>
+            </div>
+        </div>
+
+        <div id="rom-system-section" style="display: none;">
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.rom_system') %></label>
+            <select name="rom_system" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                <option value="automatic" selected><%= __('games.automatic_detection') %></option>
+                <optgroup label="Nintendo">
+                    <option value="nes">NES (Nintendo Entertainment System)</option>
+                    <option value="snes">SNES (Super Nintendo)</option>
+                    <option value="gb">GB/GBC (Game Boy/Game Boy Color)</option>
+                    <option value="gba">GBA (Game Boy Advance)</option>
+                    <option value="n64">N64 (Nintendo 64)</option>
+                    <option value="nds">NDS (Nintendo DS)</option>
+                    <option value="vb">VB (Virtual Boy)</option>
+                </optgroup>
+                <optgroup label="Sega">
+                    <option value="genesis">Genesis/Mega Drive</option>
+                    <option value="segaMS">Master System</option>
+                    <option value="segaGG">Game Gear</option>
+                    <option value="sega32x">32X</option>
+                    <option value="segaCD">Sega CD</option>
+                    <option value="segaSaturn">Saturn</option>
+                </optgroup>
+                <optgroup label="Sony">
+                    <option value="psx">PSX (PlayStation 1)</option>
+                    <option value="psp">PSP (PlayStation Portable)</option>
+                </optgroup>
+                <optgroup label="Atari">
+                    <option value="atari2600">Atari 2600</option>
+                    <option value="atari7800">Atari 7800</option>
+                    <option value="a5200">Atari 5200</option>
+                    <option value="lynx">Atari Lynx</option>
+                    <option value="jaguar">Atari Jaguar</option>
+                </optgroup>
+                <optgroup label="Other">
+                    <option value="pce">PCE (PC Engine/TurboGrafx-16)</option>
+                    <option value="3do">3DO</option>
+                    <option value="c64">Commodore 64</option>
+                    <option value="amiga">Amiga</option>
+                    <option value="coleco">ColecoVision</option>
+                    <option value="ngp">Neo Geo Pocket</option>
+                    <option value="ws">WonderSwan</option>
+                    <option value="arcade">Arcade (MAME)</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div id="file-upload-section">
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.game_file') %></label>
+            <input type="file" name="game_file" accept=".html,.swf,.zip" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+        </div>
+
+        <div id="rom-file-upload-section" style="display: none;">
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.rom_file') %></label>
+            <input type="file" name="game_file" accept=".nes,.snes,.sfc,.smc,.gba,.gb,.gbc,.md,.gen,.smd,.n64,.z64,.v64,.bin,.cue,.iso,.pce,.zip" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" disabled>
+            <small class="text-gray-500 text-xs"><%= __('games.rom_formats') %></small>
+        </div>
+
+        <div id="embed-url-section" style="display: none;">
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.embed_url') %></label>
+            <input type="url" name="embed_url" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="https://example.com/game">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.width') %></label>
+                <input type="number" name="width" value="800" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.height') %></label>
+                <input type="number" name="height" value="600" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.controls') %></label>
+            <textarea name="controls" rows="2" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.controls_placeholder') %>"></textarea>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.tags') %></label>
+            <div class="tags-input-container">
+                <input type="hidden" name="tags" id="tagsHiddenInput" />
+                <div id="tagsContainer" class="flex flex-wrap gap-2 mb-2 min-h-[2rem] empty:hidden"></div>
+                <input type="text" id="tagInput" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('games.tags_placeholder') %>">
+            </div>
+            <p class="mt-1 text-xs text-gray-500"><%= __('games.tags_help') %></p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.featured') %></label>
+                <select name="is_featured" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                    <option value="0"><%= __('forms.normal') %></option>
+                    <option value="1"><%= __('forms.featured') %></option>
+                </select>
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('forms.status') %></label>
+                <select name="is_active" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                    <option value="1"><%= __('forms.active') %></option>
+                    <option value="0"><%= __('forms.inactive') %></option>
+                </select>
+            </div>
+
+            <div id="api-enabled-section" style="display: none;">
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('games.api_integration') %></label>
+                <select name="api_enabled" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                    <option value="0"><%= __('forms.disabled') %></option>
+                    <option value="1"><%= __('forms.enabled') %></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl hover:-translate-y-1">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><%= __('buttons.create_game') %>
+            </button>
+        </div>
+    </form>
+</div>
+

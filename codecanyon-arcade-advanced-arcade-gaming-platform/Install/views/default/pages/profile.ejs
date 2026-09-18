@@ -1,0 +1,413 @@
+<%- include('../header.ejs', { page }) %>
+
+    <%- include('../modules/sidebar.block.ejs', { page }) %>
+
+    <%- include('../modules/header.block.ejs', { page }) %>
+
+    <div system-wrapper>
+        <!-- main content -->
+        <main class="container mx-auto px-4 sm:px-6 py-6 lg:py-8 space-y-8 lg:space-y-12">
+            <!-- Header Banner Ad -->
+            <div class="flex justify-center">
+                <% if (enable_frontend_pjax === '0') { %>
+                    <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: '!hidden lg:!block mx-auto' }) %>
+                    <!-- Mobile header ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden mx-auto' }) %>
+                <% } else { %>
+                    <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: '!hidden lg:!block mx-auto' }) %>
+                    <!-- Mobile header ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden mx-auto' }) %>
+                <% } %>
+            </div>
+
+            <!-- Profile Header -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div class="flex-shrink-0">
+                    <img src="<%= profileUser?.avatarUrl || 'https://dummyimage.com/128x128/4F46E5/FFFFFF&text=User' %>" alt="Profile Picture"
+                        class="w-32 h-32 rounded-full border-4 border-orange-400 shadow-md object-cover" />
+                </div>
+                <div class="flex-1 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100"><%= profileUser?.first_name && profileUser?.last_name ? (profileUser.first_name + ' ' + profileUser.last_name) : profileUser?.username || __('common.user') %></h1>
+                            <div class="flex items-center gap-2 mt-1">
+                                <p class="text-gray-600 dark:text-gray-400 text-lg">@<%= profileUser?.username || 'username' %></p>
+                                <% if (userCountry) { %>
+                                    <img src="https://flagcdn.com/24x18/<%= userCountry.code.toLowerCase() %>.png" 
+                                        alt="<%= userCountry.name %>" 
+                                        title="<%= userCountry.name %>"
+                                        class="w-6 h-auto border border-gray-200 dark:border-gray-600 rounded-sm shadow-sm">
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <% if (!isOwnProfile && user) { %>
+                            <div class="flex gap-2" data-username="<%= profileUser.username %>">
+                                <% if (!isCurrentlyFollowing) { %>
+                                    <!-- Not following -->
+                                    <button id="followUserBtn" 
+                                            data-username="<%= profileUser.username %>"
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                        <%= __('user.follow') %>
+                                    </button>
+                                <% } else { %>
+                                    <!-- Already following -->
+                                    <button id="unfollowUserBtn" 
+                                            data-username="<%= profileUser.username %>"
+                                            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors duration-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <%= __('user.following') %>
+                                    </button>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <% if (profileUser?.bio) { %>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-100 dark:border-gray-600">
+                        <h2 class="font-semibold text-gray-800 dark:text-gray-200 mb-1"><%= __('user.about_me') %></h2>
+                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed"><%= profileUser.bio %></p>
+                    </div>
+                    <% } else { %>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-100 dark:border-gray-600">
+                        <h2 class="font-semibold text-gray-800 dark:text-gray-200 mb-1"><%= __('user.about_me') %></h2>
+                        <p class="text-gray-500 dark:text-gray-400 italic"><%= __('user.no_bio') %></p>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Rank Section -->
+            <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-600 rounded-xl shadow-lg p-6 text-white relative overflow-hidden">
+                <!-- Background Pattern -->
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-16 -translate-y-16"></div>
+                    <div class="absolute bottom-0 right-0 w-24 h-24 bg-white rounded-full translate-x-12 translate-y-12"></div>
+                </div>
+                
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+                        <!-- Rank Badge -->
+                        <div class="flex-shrink-0 text-center">
+                            <div class="relative inline-block">
+                                <div class="w-24 h-24 bg-white/20 backdrop-blur-lg rounded-full flex items-center justify-center border-3 border-white/30 shadow-xl">
+                                    <div class="text-center">
+                                        <div class="text-3xl font-bold text-white drop-shadow-lg"><%= profileUser.level || 1 %></div>
+                                        <div class="text-xs font-medium text-white/90 -mt-1"><%= __('user.rank_label') %></div>
+                                    </div>
+                                </div>
+                                <!-- Rank Title Badge -->
+                                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-lg whitespace-nowrap">
+                                    <%= levelTitle || __('games.beginner') %>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Rank Details -->
+                        <div class="flex-1 space-y-4 text-center md:text-left">
+                            <div>
+                                <h2 class="text-2xl font-bold text-white mb-1"><%= __('user.rank_progress') %></h2>
+                                <p class="text-white/80 text-base">
+                                    <% const currentExp = profileUser.exp_points || 0; %>
+                                    <% const totalEarned = profileUser.total_exp_earned || 0; %>
+                                    <%= currentExp.toLocaleString() %> EXP
+                                    <span class="text-white/60 text-sm">/ Total: <%= totalEarned.toLocaleString() %></span>
+                                </p>
+                            </div>
+                            
+                            <!-- Progress to Next Rank -->
+                            <div class="space-y-2">
+                                <% if (nextLevelExp) { %>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-white/80"><%= __('user.to_rank') %> <%= (profileUser.level || 1) + 1 %></span>
+                                    <span class="text-white font-medium">
+                                        <%= Math.round(expProgress.percentage) %>%
+                                    </span>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="w-full bg-white/20 rounded-full h-3 shadow-inner backdrop-blur-sm">
+                                    <div class="bg-gradient-to-r from-yellow-400 to-orange-400 h-3 rounded-full shadow-lg transition-all duration-500 relative overflow-hidden" 
+                                        style="width: <%= Math.round(expProgress.percentage) %>%">
+                                        <!-- Shimmer Effect -->
+                                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- EXP Numbers -->
+                                <div class="flex justify-between text-xs text-white/70">
+                                    <span><%= expProgress.current.toLocaleString() %> EXP</span>
+                                    <span><%= expProgress.required.toLocaleString() %> <%= __('user.needed') %></span>
+                                </div>
+                                <% } else { %>
+                                <!-- Max Level Reached -->
+                                <div class="text-center py-2">
+                                    <div class="text-yellow-400 text-base font-bold"><%= __('user.max_rank_achieved') %></div>
+                                    <div class="text-white/80 text-xs mt-1"><%= __('user.highest_rank_desc') %></div>
+                                </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Stats -->
+                        <div class="flex md:flex-col gap-3 md:gap-2">
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div class="text-xl font-bold text-white"><%= profileUser.level || 1 %></div>
+                                <div class="text-xs text-white/80"><%= __('user.rank_label') %></div>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20 min-w-[80px]">
+                                <div class="text-xl font-bold text-white"><%= Math.floor((profileUser.total_exp_earned || 0) / 1000) %><span class="text-sm">k</span></div>
+                                <div class="text-xs text-white/80"><%= __('user.exp_label') %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <%= __('user.achievements') %> Section -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-6">
+                <h2 class="font-semibold text-gray-900 dark:text-gray-100 text-xl flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                        </svg>
+                    </div>
+                    <%= __('user.achievements') %>
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- EXP Milestone -->
+                    <div class="bg-gradient-to-br from-blue-50 dark:from-blue-900/30 to-indigo-50 dark:to-indigo-900/30 border border-blue-100 dark:border-blue-800/50 rounded-xl p-4 text-center">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                        </div>
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400"><%= (profileUser.total_exp_earned || 0).toLocaleString() %></div>
+                        <div class="text-sm text-blue-600 dark:text-blue-400 font-medium"><%= __('user.exp_points_earned') %></div>
+                    </div>
+                    
+                    <!-- Current Rank -->
+                    <div class="bg-gradient-to-br from-purple-50 dark:from-purple-900/30 to-purple-100 dark:to-purple-900/30 border border-purple-100 dark:border-purple-800/50 rounded-xl p-4 text-center">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                            </svg>
+                        </div>
+                        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400"><%= profileUser.level || 1 %></div>
+                        <div class="text-sm text-purple-600 dark:text-purple-400 font-medium"><%= __('user.current_rank') %></div>
+                    </div>
+                    
+                    <!-- Games Played -->
+                    <div class="bg-gradient-to-br from-green-50 dark:from-green-900/30 to-emerald-50 dark:to-emerald-900/30 border border-green-100 dark:border-green-800/50 rounded-xl p-4 text-center">
+                        <div class="w-12 h-12 bg-green-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="text-2xl font-bold text-green-600 dark:text-green-400"><%= lastPlayed.length %></div>
+                        <div class="text-sm text-green-600 dark:text-green-400 font-medium"><%= __('user.games_played') %></div>
+                    </div>
+                    
+                    <!-- Favorites -->
+                    <div class="bg-gradient-to-br from-pink-50 dark:from-pink-900/30 to-rose-50 dark:to-rose-900/30 border border-pink-100 dark:border-pink-800/50 rounded-xl p-4 text-center">
+                        <div class="w-12 h-12 bg-pink-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </div>
+                        <div class="text-2xl font-bold text-pink-600 dark:text-pink-400"><%= favorites.length %></div>
+                        <div class="text-sm text-pink-600 dark:text-pink-400 font-medium"><%= __('user.favorite_games') %></div>
+                    </div>
+                </div>
+                
+                <!-- <%= __('user.rank_progress') %> Visualization -->
+                <% if (nextLevelExp) { %>
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 border border-gray-100 dark:border-gray-600">
+                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center"><%= __('user.rank_progress_breakdown') %></h3>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-center">
+                            <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-1 flex items-center justify-center">
+                                <span class="text-xs font-bold text-white"><%= (profileUser.level || 1) - 1 %></span>
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400"><%= __('user.previous_rank') %></div>
+                        </div>
+                        
+                        <div class="flex-1 mx-4">
+                            <div class="relative">
+                                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
+                                    <div class="bg-gradient-to-r from-blue-400 to-purple-500 h-3 rounded-full transition-all duration-1000" 
+                                        style="width: <%= Math.round(expProgress.percentage) %>%"></div>
+                                </div>
+                                <div class="absolute top-full mt-1 text-xs text-gray-600 dark:text-gray-400 flex justify-between w-full">
+                                    <span><%= expProgress.current.toLocaleString() %></span>
+                                    <span><%= (expProgress.current + expProgress.required - expProgress.current).toLocaleString() %></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-1 flex items-center justify-center">
+                                <span class="text-xs font-bold text-white"><%= profileUser.level || 1 %></span>
+                            </div>
+                            <div class="text-xs text-gray-700 dark:text-gray-300 font-medium"><%= __('user.current_rank_label') %></div>
+                        </div>
+                        
+                        <div class="flex-1 mx-4">
+                            <div class="w-full bg-gray-100 dark:bg-gray-600 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <div class="w-8 h-8 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-full mx-auto mb-1 flex items-center justify-center">
+                                <span class="text-xs font-bold text-gray-400 dark:text-gray-500"><%= (profileUser.level || 1) + 1 %></span>
+                            </div>
+                            <div class="text-xs text-gray-400 dark:text-gray-500"><%= __('user.next_rank') %></div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+
+            <!-- Profile Details Sections -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Follow Stats -->
+                <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-4">
+                    <h2 class="font-semibold text-gray-900 dark:text-gray-100 text-lg flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                        </svg>
+<%= __('user.follow_stats') %>
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="followerCount"><%= followCounts.followers %></div>
+                            <div class="text-sm text-blue-600 dark:text-blue-400 font-medium"><%= __('user.followers') %></div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 dark:bg-green-900/30 rounded-xl">
+                            <div class="text-2xl font-bold text-green-600 dark:text-green-400"><%= followCounts.following %></div>
+                            <div class="text-sm text-green-600 dark:text-green-400 font-medium"><%= __('user.following') %></div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Favorite Games -->
+                <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-4">
+                    <h2 class="font-semibold text-gray-900 dark:text-gray-100 text-lg flex items-center gap-2">
+                        <svg class="w-6 h-6 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+<%= __('user.favorite_games') %> (<%= favorites.length %>)
+                    </h2>
+                    <% if (favorites.length > 0) { %>
+                    <div class="flex gap-3 overflow-x-auto scrollbar-none">
+                        <% favorites.slice(0, 4).forEach(favorite => { %>
+                        <a href="/play/<%= favorite.slug %>" class="flex-shrink-0 hover:scale-105 transition-transform duration-200" system-nav>
+                            <div class="game-thumbnail relative" data-game-id="<%= favorite.id %>">
+                                <% if (favorite.parsedThumbnail && favorite.parsedThumbnail.webp && favorite.parsedThumbnail.original) {
+                                    let webpImage = favorite.parsedThumbnail.webp.thumbnail || favorite.parsedThumbnail.webp.standard;
+                                    let originalImage = favorite.parsedThumbnail.original.thumbnail || favorite.parsedThumbnail.original.standard;
+                                    
+                                    if (webpImage && originalImage) { %>
+                                        <picture>
+                                            <source srcset="/<%= webpImage.relativePath %>" type="image/webp">
+                                            <img src="/<%= originalImage.relativePath %>" alt="<%= favorite.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy">
+                                        </picture>
+                                    <% } else { %>
+                                        <img src="https://dummyimage.com/80x80/4F46E5/FFFFFF&text=<%= encodeURIComponent(favorite.title.charAt(0)) %>" alt="<%= favorite.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy">
+                                    <% }
+                                } else if (favorite.thumbnail) { %>
+                                    <img src="<%= favorite.thumbnail.startsWith('/') ? favorite.thumbnail : '/' + favorite.thumbnail %>" alt="<%= favorite.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy">
+                                <% } else { %>
+                                    <img src="https://dummyimage.com/80x80/4F46E5/FFFFFF&text=<%= encodeURIComponent(favorite.title.charAt(0)) %>" alt="<%= favorite.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy">
+                                <% } %>
+                            </div>
+                        </a>
+                        <% }); %>
+                    </div>
+                    <% } else { %>
+                    <p class="text-gray-500 dark:text-gray-400 italic"><%= __('user.no_favorite_games_yet') %></p>
+                    <% } %>
+                </section>
+                
+                <!-- Sidebar Rectangle Ad -->
+                <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 flex items-center justify-center">
+                    <% if (enable_frontend_pjax === '0') { %>
+                        <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                        <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: 'mx-auto' }) %>
+                    <% } else { %>
+                        <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                        <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: 'mx-auto' }) %>
+                    <% } %>
+                </section>
+            </div>
+            <!-- Last Played Games -->
+            <div class="grid grid-cols-1 gap-8">
+                <section class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 space-y-4">
+                    <h2 class="font-semibold text-gray-900 dark:text-gray-100 text-lg flex items-center gap-2">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+<%= __('user.last_played_games') %> (<%= lastPlayed.length %>)
+                    </h2>
+                    <% if (lastPlayed.length > 0) { %>
+                    <div class="flex gap-3 overflow-x-auto scrollbar-none">
+                        <% lastPlayed.forEach(game => { %>
+                        <a href="/play/<%= game.slug %>" class="flex-shrink-0 hover:scale-105 transition-transform duration-200" system-nav>
+                            <div class="game-thumbnail relative" data-game-id="<%= game.id %>">
+                                <% if (game.parsedThumbnail && game.parsedThumbnail.webp && game.parsedThumbnail.original) {
+                                    let webpImage = game.parsedThumbnail.webp.thumbnail || game.parsedThumbnail.webp.standard;
+                                    let originalImage = game.parsedThumbnail.original.thumbnail || game.parsedThumbnail.original.standard;
+                                    
+                                    if (webpImage && originalImage) { %>
+                                        <picture>
+                                            <source srcset="/<%= webpImage.relativePath %>" type="image/webp">
+                                            <img src="/<%= originalImage.relativePath %>" alt="<%= game.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy" title="<%= game.title %> - Last played: <%= new Date(game.played_at).toLocaleDateString() %>">
+                                        </picture>
+                                    <% } else { %>
+                                        <img src="https://dummyimage.com/80x80/4F46E5/FFFFFF&text=<%= encodeURIComponent(game.title.charAt(0)) %>" alt="<%= game.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy" title="<%= game.title %> - Last played: <%= new Date(game.played_at).toLocaleDateString() %>">
+                                    <% }
+                                } else if (game.thumbnail) { %>
+                                    <img src="<%= game.thumbnail.startsWith('/') ? game.thumbnail : '/' + game.thumbnail %>" alt="<%= game.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy" title="<%= game.title %> - Last played: <%= new Date(game.played_at).toLocaleDateString() %>">
+                                <% } else { %>
+                                    <img src="https://dummyimage.com/80x80/4F46E5/FFFFFF&text=<%= encodeURIComponent(game.title.charAt(0)) %>" alt="<%= game.title %>" class="w-20 h-14 object-cover rounded-xl shadow-md hover:shadow-lg" loading="lazy" title="<%= game.title %> - Last played: <%= new Date(game.played_at).toLocaleDateString() %>">
+                                <% } %>
+                            </div>
+                        </a>
+                        <% }); %>
+                    </div>
+                    <% } else { %>
+                    <p class="text-gray-500 dark:text-gray-400 italic"><%= __('user.no_games_played_yet') %></p>
+                    <% } %>
+                </section>
+            </div>
+            
+            <!-- Footer Banner Ad -->
+            <div class="flex justify-center mt-8">
+                <% if (enable_frontend_pjax === '0') { %>
+                    <!-- Direct ads for AdSense compatibility when PJAX is disabled -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'footer-banner', width: 728, height: 90, classes: '!hidden lg:!block mx-auto' }) %>
+                    <!-- Mobile footer ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_direct.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden mx-auto' }) %>
+                <% } else { %>
+                    <!-- AJAX ads for smooth navigation when PJAX is enabled -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'footer-banner', width: 728, height: 90, classes: '!hidden lg:!block mx-auto' }) %>
+                    <!-- Mobile footer ad (sidebar rectangle) -->
+                    <%- include('../modules/ad_container.block.ejs', { placement: 'sidebar-rectangle', width: 300, height: 250, classes: '!block lg:!hidden mx-auto' }) %>
+                <% } %>
+            </div>
+        </main> 
+    </div>
+
+    <%- include('../modules/footer.block.ejs', { page }) %>
+
+<%- include('../footer.ejs', { page }) %>

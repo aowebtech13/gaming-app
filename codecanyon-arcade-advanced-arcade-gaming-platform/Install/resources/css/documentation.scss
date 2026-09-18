@@ -1,0 +1,238 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Documentation specific styles */
+.doc-layout {
+  @apply min-h-screen bg-gray-50;
+}
+
+.doc-sidebar {
+  @apply fixed top-0 left-0 h-full w-80 bg-white border-r border-gray-200 overflow-y-auto z-40 transform transition-transform duration-300;
+}
+
+.doc-sidebar.closed {
+  @apply -translate-x-full;
+}
+
+.doc-sidebar-header {
+  @apply p-6 border-b border-gray-200 bg-white;
+}
+
+.doc-sidebar-title {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.doc-sidebar-subtitle {
+  @apply text-gray-600 text-sm mt-1;
+}
+
+.doc-nav {
+  @apply p-4;
+}
+
+.doc-nav-section {
+  @apply mb-6;
+}
+
+.doc-nav-section:first-child {
+  @apply pt-4;
+}
+
+.doc-nav-section-title {
+  @apply text-xs uppercase font-semibold text-gray-500 mb-3 tracking-wide;
+}
+
+.doc-nav-list {
+  @apply space-y-1;
+}
+
+.doc-nav-item {
+  @apply block px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors;
+}
+
+.doc-nav-item.active {
+  @apply text-blue-600 bg-blue-50 border-r-2 border-blue-600;
+}
+
+.doc-nav-sublist {
+  @apply ml-7 mt-1 space-y-1;
+}
+
+.doc-nav-subitem {
+  @apply block px-2 py-1 text-xs text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors;
+}
+
+.doc-content {
+  @apply ml-80 transition-all duration-300;
+}
+
+.doc-content.full-width {
+  @apply ml-0;
+}
+
+.doc-container {
+  @apply max-w-4xl px-8 py-8;
+}
+
+.doc-header {
+  @apply mb-12;
+}
+
+.doc-title {
+  @apply text-4xl font-bold text-gray-900 mb-4;
+}
+
+.doc-subtitle {
+  @apply text-xl text-gray-600 mb-8;
+}
+
+.doc-mobile-menu-btn {
+  @apply fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg border border-gray-200 lg:hidden;
+}
+
+.doc-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden;
+}
+
+.doc-section {
+  @apply mb-16;
+}
+
+.doc-section-title {
+  @apply text-3xl font-bold text-gray-900 mb-6 border-b-2 border-blue-500 pb-2;
+}
+
+.doc-subsection {
+  @apply mb-8;
+}
+
+.doc-subsection-title {
+  @apply text-2xl font-semibold text-gray-800 mb-4;
+}
+
+.doc-text {
+  @apply text-gray-700 leading-relaxed mb-4;
+}
+
+.doc-list {
+  @apply space-y-2 mb-6;
+}
+
+.doc-list-item {
+  @apply flex items-start space-x-3;
+}
+
+.doc-list-icon {
+  @apply w-5 h-5 text-green-500 mt-0.5 flex-shrink-0;
+}
+
+.doc-code {
+  @apply bg-gray-100 rounded-lg p-4 font-mono text-sm border border-gray-200 mb-4;
+}
+
+.doc-code-inline {
+  @apply bg-gray-100 px-2 py-1 rounded font-mono text-sm;
+}
+
+.doc-highlight {
+  @apply bg-blue-50 border-l-4 border-blue-500 p-4 mb-6;
+}
+
+.doc-warning {
+  @apply bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6;
+}
+
+.doc-error {
+  @apply bg-red-50 border-l-4 border-red-500 p-4 mb-6;
+}
+
+.doc-success {
+  @apply bg-green-50 border-l-4 border-green-500 p-4 mb-6;
+}
+
+.doc-feature-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8;
+}
+
+.doc-feature-card {
+  @apply bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow;
+}
+
+.doc-feature-icon {
+  @apply w-12 h-12 text-blue-500 mb-4;
+}
+
+.doc-feature-title {
+  @apply text-xl font-semibold text-gray-900 mb-2;
+}
+
+.doc-feature-description {
+  @apply text-gray-600 text-sm;
+}
+
+.doc-image-placeholder {
+  @apply bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500 mb-6;
+}
+
+.doc-table {
+  @apply w-full border-collapse border border-gray-300 mb-6;
+}
+
+.doc-table th {
+  @apply bg-gray-50 border border-gray-300 px-4 py-2 text-left font-semibold;
+}
+
+.doc-table td {
+  @apply border border-gray-300 px-4 py-2;
+}
+
+.doc-button {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors;
+}
+
+.doc-button-secondary {
+  @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .doc-container {
+    @apply px-4 py-6;
+  }
+  
+  .doc-title {
+    @apply text-3xl;
+  }
+  
+  .doc-section-title {
+    @apply text-2xl;
+  }
+  
+  .doc-subsection-title {
+    @apply text-xl;
+  }
+  
+  .doc-nav-list {
+    @apply flex-col space-y-2;
+  }
+  
+  .doc-feature-grid {
+    @apply grid-cols-1;
+  }
+}
+
+/* Print styles */
+@media print {
+  .doc-nav {
+    @apply hidden;
+  }
+  
+  .doc-container {
+    @apply max-w-none px-0;
+  }
+  
+  .doc-section {
+    @apply break-inside-avoid;
+  }
+}

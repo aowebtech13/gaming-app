@@ -1,0 +1,44 @@
+<div class="p-6">
+    <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+            <svg class="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><%= title %>
+        </h3>
+
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <form system-form class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.comments.user') %></label>
+                <input type="text" value="<%= data.comment.username %>" readonly class="block w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-500 cursor-not-allowed">
+            </div>
+
+            <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.comments.game') %></label>
+                <input type="text" value="<%= data.comment.game_title %>" readonly class="block w-full rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-500 cursor-not-allowed">
+            </div>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.comments.comment') %></label>
+            <textarea name="comment" rows="4" required class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg" placeholder="<%= __('dashboard.widgets.update.comments.comment_placeholder') %>"><%= data.comment.comment %></textarea>
+        </div>
+
+        <div>
+            <label class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.comments.status') %></label>
+            <select name="is_active" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+                <option value="1" <%= data.comment.is_active ? 'selected' : '' %>><%= __('dashboard.widgets.update.comments.active_option') %></option>
+                <option value="0" <%= !data.comment.is_active ? 'selected' : '' %>><%= __('dashboard.widgets.update.comments.inactive_option') %></option>
+            </select>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-blue-700 hover:to-indigo-700 hover:shadow-2xl hover:-translate-y-1">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><%= __('dashboard.widgets.update.comments.submit_button') %>
+            </button>
+        </div>
+    </form>
+</div>

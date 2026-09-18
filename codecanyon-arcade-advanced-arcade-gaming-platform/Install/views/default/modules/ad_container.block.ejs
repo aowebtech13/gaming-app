@@ -1,0 +1,39 @@
+<%
+// Ad Container Component
+// Usage: include('modules/ad_container.block.ejs', { placement: 'header-banner', width: 728, height: 90, classes: 'my-4' })
+
+const placementSlug = locals.placement || 'default';
+const adWidth = locals.width || 300;
+const adHeight = locals.height || 250;
+const containerClasses = locals.classes || '';
+const autoSize = locals.autoSize || false;
+%>
+
+<div class="ad-container <%= containerClasses %>" data-placement="<%= placementSlug %>" data-width="<%= adWidth %>" data-height="<%= adHeight %>" data-auto-init="true">
+    <% if (!autoSize) { %>
+    <div class="ad-wrapper relative overflow-hidden rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm" style="width: <%= adWidth %>px; height: <%= adHeight %>px;">
+    <% } else { %>
+    <div class="ad-wrapper relative overflow-hidden rounded-lg border border-gray-200/50 dark:border-gray-700/50 bg-gray-50/30 dark:bg-gray-800/30 backdrop-blur-sm">
+    <% } %>
+        <!-- Loading placeholder -->
+        <div class="ad-loading absolute inset-0 flex items-center justify-center text-xs text-gray-400 dark:text-gray-500">
+            <div class="text-center">
+                <div class="w-6 h-6 border-2 border-gray-300 dark:border-gray-600 border-t-blue-500 rounded-full animate-spin mx-auto mb-2"></div>
+                <span><%= __('ads.loading') %></span>
+            </div>
+        </div>
+        
+        <!-- Ad content will be injected here -->
+        <div class="ad-content hidden">
+            <!-- Dynamic ad content -->
+        </div>
+        
+        <!-- Fallback for ad blockers or no ads -->
+        <div class="ad-fallback hidden p-4 text-center text-gray-500 dark:text-gray-400 text-xs">
+            <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded p-4">
+                <div class="text-gray-400 dark:text-gray-500 mb-1"><%= __('ads.advertisement') %></div>
+                <div class="text-gray-300 dark:text-gray-600 text-xs"><%= __('ads.support_message') %></div>
+            </div>
+        </div>
+    </div>
+</div>

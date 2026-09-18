@@ -1,0 +1,21 @@
+{
+  "name": "Default",
+  "version": "1.4",
+  "author": "Titan Systems",
+  "author_url": "https://titansystems.ph",
+  "preview_url": "/?theme=default",
+  "preview_image": "/assets/images/default_preview.jpg",
+  "rebuild": [
+    {
+      "input": "resources/css/default.scss",
+      "output": "public/assets/css/default.min.css",
+      "command": "tailwindcss -i {input} -o {output} --minify"
+    },
+    {
+      "input": "resources/js/default.js",
+      "output": "public/assets/js/default.min.js",
+      "command": "terser {input} -o {output} --compress drop_console=true --mangle --comments false"
+    }
+  ],
+  "uninstall": []
+}

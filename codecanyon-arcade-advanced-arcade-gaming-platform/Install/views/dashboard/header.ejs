@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="<%= currentLanguage || 'en' %>" <% if (isRTL) { %>dir="rtl" <% } %>class="h-full">
+
+<head>
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="//fonts.googleapis.com">
+    <link rel="preconnect" href="//fonts.gstatic.com" crossorigin>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <!-- Favicon links -->
+    <% if (typeof site_favicon !== 'undefined' && site_favicon) { %>
+      <% 
+        let faviconData = null;
+        try {
+          if (typeof site_favicon === 'string' && site_favicon.startsWith('{')) {
+            faviconData = JSON.parse(site_favicon);
+          }
+        } catch(e) {
+          // Use fallback if JSON parsing fails
+        }
+        
+        if (faviconData && faviconData.webp && faviconData.original) {
+      %>
+        <!-- Modern WebP favicons -->
+        <link rel="icon" type="image/webp" sizes="16x16" href="/<%= faviconData.webp.small.relativePath %>">
+        <link rel="icon" type="image/webp" sizes="32x32" href="/<%= faviconData.webp.standard.relativePath %>">
+        
+        <!-- PNG fallbacks -->
+        <link rel="icon" type="image/png" sizes="16x16" href="/<%= faviconData.original.small.relativePath %>">
+        <link rel="icon" type="image/png" sizes="32x32" href="/<%= faviconData.original.standard.relativePath %>">
+        
+        <!-- Apple Touch Icon -->
+        <link rel="apple-touch-icon" sizes="180x180" href="/<%= faviconData.original.apple.relativePath %>">
+        
+        <!-- Android/PWA Icons -->
+        <link rel="icon" type="image/png" sizes="192x192" href="/<%= faviconData.original.android.relativePath %>">
+        <link rel="icon" type="image/png" sizes="512x512" href="/<%= faviconData.original.pwa.relativePath %>">
+        
+        <!-- Legacy ICO fallback -->
+        <link rel="shortcut icon" href="/<%= faviconData.original.standard.relativePath %>">
+      <% } else { %>
+        <!-- Simple favicon (legacy format) -->
+        <link rel="shortcut icon" href="<%= site_favicon.startsWith('/') ? site_favicon : '/' + site_favicon %>">
+      <% } %>
+    <% } else { %>
+      <!-- Default favicon -->
+      <link rel="shortcut icon" href="/assets/images/favicon.ico">
+    <% } %>
+
+    <title><%- title %></title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/dashboard.min.css">
+    
+    <!-- Translation system for client-side JavaScript -->
+    <script>
+      // Translation data and functions
+      window.TRANSLATIONS = <%-translationsJSON || '{}'%>;
+      window.CURRENT_LANGUAGE = '<%= currentLanguage || 'en' %>';
+      window.IS_RTL = <%= isRTL || false %>;
+      
+      // Global translation function for JavaScript
+      window.__ = function(key, variables) {
+        variables = variables || {};
+        
+        // Get nested translation value
+        function getNestedValue(obj, path) {
+          return path.split('.').reduce(function(current, key) {
+            return current && current[key] !== undefined ? current[key] : undefined;
+          }, obj);
+        }
+        
+        // Get translation
+        var translation = getNestedValue(window.TRANSLATIONS, key);
+        
+        // Fallback to key if translation not found
+        if (translation === undefined) {
+          translation = key;
+        }
+        
+        // Replace variables in format {variable}
+        if (typeof translation === 'string') {
+          translation = translation.replace(/\{(\w+)\}/g, function(match, varKey) {
+            return variables[varKey] !== undefined ? variables[varKey] : match;
+          });
+        }
+        
+        return translation;
+      };
+      
+      // Language information
+      window.LANGUAGE_INFO = {
+        current: '<%= currentLanguage || 'en' %>',
+        isRTL: <%= isRTL || false %>,
+        available: <%-JSON.stringify(availableLanguages || [])%>
+      };
+    </script>
+</head>
+
+<body class="h-full bg-gray-50 transition-colors duration-300">

@@ -1,0 +1,89 @@
+<div class="p-6">
+    <div class="flex items-start justify-between">
+        <h3 class="text-lg font-semibold text-gray-900">
+            <svg class="w-6 h-6 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg><%= __('dashboard.widgets.update.settings_exp.title') %>
+        </h3>
+
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <form system-form class="mt-4 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="exp_game_completion" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.game_completion') %></label>
+                <input type="number" id="exp_game_completion" name="exp_game_completion" value="<%= data.exp_game_completion || '50' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+            
+            <div>
+                <label for="exp_daily_login" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.daily_login') %></label>
+                <input type="number" id="exp_daily_login" name="exp_daily_login" value="<%= data.exp_daily_login || '10' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="exp_first_play" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.first_play') %></label>
+                <input type="number" id="exp_first_play" name="exp_first_play" value="<%= data.exp_first_play || '25' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+            
+            <div>
+                <label for="exp_game_rating" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.game_rating') %></label>
+                <input type="number" id="exp_game_rating" name="exp_game_rating" value="<%= data.exp_game_rating || '5' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="exp_game_comment" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.game_comment') %></label>
+                <input type="number" id="exp_game_comment" name="exp_game_comment" value="<%= data.exp_game_comment || '3' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+            
+            <div>
+                <label for="exp_follow_user" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.follow_user') %></label>
+                <input type="number" id="exp_follow_user" name="exp_follow_user" value="<%= data.exp_follow_user || '2' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="exp_profile_complete" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.profile_complete') %></label>
+                <input type="number" id="exp_profile_complete" name="exp_profile_complete" value="<%= data.exp_profile_complete || '20' %>" min="0"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+            
+            <div>
+                <label for="exp_multiplier_weekends" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.weekend_multiplier') %></label>
+                <input type="number" id="exp_multiplier_weekends" name="exp_multiplier_weekends" value="<%= data.exp_multiplier_weekends || '1.5' %>" min="1" step="0.1"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="exp_bonus_streak_days" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.bonus_streak_days') %></label>
+                <input type="number" id="exp_bonus_streak_days" name="exp_bonus_streak_days" value="<%= data.exp_bonus_streak_days || '7' %>" min="1"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+            
+            <div>
+                <label for="exp_bonus_streak_multiplier" class="mb-1 block text-sm font-medium text-gray-700"><%= __('dashboard.widgets.update.settings_exp.streak_bonus_multiplier') %></label>
+                <input type="number" id="exp_bonus_streak_multiplier" name="exp_bonus_streak_multiplier" value="<%= data.exp_bonus_streak_multiplier || '2.0' %>" min="1" step="0.1"
+                    class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-md placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg">
+            </div>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button type="submit" class="inline-flex items-center gap-1 sm:gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-white shadow-xl transition-all duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-2xl hover:-translate-y-1">
+                <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/></svg><%= __('dashboard.widgets.update.settings_exp.submit_button') %>
+            </button>
+        </div>
+    </form>
+</div>

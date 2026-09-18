@@ -1,0 +1,46 @@
+<%- include('../../header.ejs', { page }) %>
+
+<div class="fixed inset-0 flex items-center justify-center bg-gray-50 dark:bg-gray-900 z-50">
+    <div class="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Error Card -->
+        <div class="rounded-xl bg-white dark:bg-gray-800 p-8 shadow-lg hover:shadow-xl dark:shadow-2xl transition-all duration-200">
+            <!-- Error Icon -->
+            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30 shadow-lg">
+                <svg class="w-8 h-8 text-red-600 drop-shadow-sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+
+            <!-- Error Content -->
+            <div class="text-center">
+                <!-- Error Code -->
+                <div class="mb-2 text-sm font-medium text-red-600 uppercase tracking-wide">
+                    <%= __('errors.404_code') %>
+                </div>
+
+                <!-- Error Title -->
+                <h1 class="mb-3 text-2xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
+                    <%= __('errors.404_title') %>
+                </h1>
+
+                <!-- Error Description -->
+                <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 sm:text-base">
+                    <%= __('errors.404_description') %>
+                </p>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                    <button onclick="history.back()" class="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-md transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-600 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
+                        <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd"/>
+                        </svg>
+                        <%= __('errors.go_back') %>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../../footer.ejs') %>
+

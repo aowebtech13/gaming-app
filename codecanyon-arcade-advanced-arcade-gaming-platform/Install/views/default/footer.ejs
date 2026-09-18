@@ -1,0 +1,23 @@
+    <!-- Scripts -->
+    <script src="/assets/js/libs/fetch.min.js"></script>
+    
+    <!-- External Libraries -->
+    <script defer>
+        fetchInject([
+            "/assets/js/default.min.js",
+            "/assets/js/chatroom.float.min.js"
+        ], fetchInject([
+            "/assets/js/functions.min.js",
+            "/socket.io/socket.io.js",
+        ], fetchInject([
+            "/assets/js/libs/pjax.min.js",
+            "/assets/js/libs/topbar.min.js",
+            "/assets/js/libs/izitoast.min.js",
+        ], fetchInject([
+            "/assets/js/libs/jquery.min.js",
+            "/assets/css/libs/izitoast.min.css"
+        ]))));
+    </script>
+</body>
+
+</html>
