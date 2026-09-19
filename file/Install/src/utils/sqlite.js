@@ -120,8 +120,13 @@ const executeSpecial = (query) => {
   }
 
   if (/^SET\s+foreign_key_checks\s*=\s*([01])/i.test(trimmed)) {
-    const enabled = /^SET\s+foreign_key_checks\s*=\s*1/i.test(trimmed) ? 'ON' : 'OFF';
-    db.pragma(`foreign_keys = ${enabled}`);
+    // SQLite migration code uses this MySQL compatibility statement. Foreign
+    // keys are enabled for the connection; toggling it inside a transaction is
+    // not permitted by SQLite, so treat it as a compatibility no-op there.
+    if (transactionDepth === 0) {
+      const enabled = /^SET\s+foreign_key_checks\s*=\s*1/i.test(trimmed) ? 'ON' : 'OFF';
+      db.pragma(`foreign_keys = ${enabled}`);
+    }
     return [{}];
   }
 
