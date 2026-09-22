@@ -159,7 +159,7 @@ export async function up(connection) {
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    // =====================================================
+    // =======================g==============================
     // CONTENT MANAGEMENT TABLES (EXACT v1.0 STRUCTURE)
     // =====================================================
 
